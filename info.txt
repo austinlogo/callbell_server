@@ -1,0 +1,23 @@
+Good information to Have
+
+
+Server API Key for GCM
+AIzaSyB77knZasH51T1ATy6Znx-JU1YV_MF3N1I
+
+
+
+
+Cloud Messaging Server API Key:
+AIzaSyBdc10A1Cy7fsYy-ocn5wwXC1Ne5GYQMgc
+
+Sender ID
+434312104937
+
+reg_id
+eVkzBXIVmDM:APA91bECnl5QHrs2i4q9Yb77Ku4CIeRJg4tktLZePH7TVnWwOK9vnblgrwfYCaWVTPSuUhTS1wb2Zq8YzQ4gXKgREGyAc8wKVVQTJrk-ILFSuq4iC0jL0Iol1FW1OuuthXRhPWfE9Z48
+
+
+curl --header "Authorization: key=AIzaSyBdc10A1Cy7fsYy-ocn5wwXC1Ne5GYQMgc" \
+       --header Content-Type:"application/json" \
+       https://gcm-http.googleapis.com/gcm/send \
+       -d "{\"registration_ids\":[\"APA91bFHv0eAPxhjLwoiFBepXy4_ec0lbRyFBEhMz4PjLwvuFMOmjgbXP5mEgBZEX90MuM_8zxneqUittSNadfBV1OxqV_Njb5UVTNQ-JT0o0hWTsHZPBtYOX7APJv_gI5dQ3FA6ydht\"]}"
