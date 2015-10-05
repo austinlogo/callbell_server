@@ -1,7 +1,8 @@
 var request = require('request');
 
-exports.send = function(msg, callback) {
-    var reg_id = "eVkzBXIVmDM:APA91bECnl5QHrs2i4q9Yb77Ku4CIeRJg4tktLZePH7TVnWwOK9vnblgrwfYCaWVTPSuUhTS1wb2Zq8YzQ4gXKgREGyAc8wKVVQTJrk-ILFSuq4iC0jL0Iol1FW1OuuthXRhPWfE9Z48";
+exports.send = function(reg_id, msg, fromu, tou, callback) {
+    // var reg_id = "eVkzBXIVmDM:APA91bECnl5QHrs2i4q9Yb77Ku4CIeRJg4tktLZePH7TVnWwOK9vnblgrwfYCaWVTPSuUhTS1wb2Zq8YzQ4gXKgREGyAc8wKVVQTJrk-ILFSuq4iC0jL0Iol1FW1OuuthXRhPWfE9Z48";
+    console.log('gcm send reg_id ' + reg_id)
     var len = 1;
 
     
@@ -17,14 +18,16 @@ exports.send = function(msg, callback) {
                         "to" : reg_id,
                         "data" : {
                             "message": msg,
-                            "fromu": "Austin",
-                            "name": "Austin"
+                            "fromu": fromu,
+                            "tou": tou
                         }, 
-                        "time-to-live" : 3600
+                        "priority": "high"
                     })
         }
         , function (error, response, body) {
-              callback({'error': error});
+            console.log("GCM Send Response: " + JSON.stringify(response));
+            console.log("GCM Send body: " + body);
+            callback({'GCM Send StatusCode ': response['statusCode'], "Error: ": error});
         }
       )
 }

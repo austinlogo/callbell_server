@@ -1,10 +1,6 @@
 Good information to Have
 
 
-Server API Key for GCM
-AIzaSyB77knZasH51T1ATy6Znx-JU1YV_MF3N1I
-
-
 
 
 Cloud Messaging Server API Key:

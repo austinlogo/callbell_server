@@ -13,7 +13,7 @@ function init() {
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS devices (' +
 		'bed_id VARCHAR(20) NOT NULL, ' +
-		'reg_id VARCHAR(50) NOT NULL, ' +
+		'reg_id VARCHAR(250) NOT NULL, ' +
 		'PRIMARY KEY (bed_id) ' +
 		');');
 }
@@ -47,6 +47,6 @@ function query(query_string, cb) {
 			console.log("error: " + err);
 		} 
 
-		cb (result);
+		cb (err, result);
 	});
 }
