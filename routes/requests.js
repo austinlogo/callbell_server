@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var dao = require('../dao/mysqldao');
+var registration = require('../business/registration');
 var gcm = require('../dao/gcmdao');
 
 /* GET home page. */
@@ -8,16 +8,12 @@ router.get('/', function (req, res, next) {
   res.render('index');
 });
 
+//Registration request for new devices and devices updating their tokens
 router.post('/register', function (req, res, next) {
-	var body = req.body
+	console.log ("registration request");
 
-	dao.init();
-
-	dao.add_device(body['from'], body['message'], function(err, result) {
-		res.send({
-			'err': err,
-			'result': result
-		});
+	registration.save_registration(req.body, function(json) {
+		res.send(json);
 	});
 
 });
@@ -26,7 +22,7 @@ router.post('/receive', function (req, res, next) {
 	var body = req.body;
 	console.log(req.body);
 
-	dao.get_reg_id(body['to'], function (err, result) {
+	mysqlDao.get_reg_id(body['to'], function (err, result) {
 		if (err != null) {
 			console.log("error");
 			return;
@@ -45,6 +41,11 @@ router.post('/receive', function (req, res, next) {
 
 	
 });
+
+
+function default_response (json, res) {
+	res.send(json);
+} 
 
 
 module.exports = router;
