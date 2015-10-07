@@ -19,19 +19,26 @@ var connection = mysql.createConnection({
 	database 	: 'call_bell'
 });
 
+
+module.exports.reg_id_key = "reg_id";
+module.exports.hospital_id_key = "hospital_id";
+module.exports.bed_id_key = "bed_id";
+
 module.exports.init = function() {
 	connection.connect();
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS devices (' +
+		'hospital_id VARCHAR(20) NOT NULL, ' +
 		'bed_id VARCHAR(20) NOT NULL, ' +
-		'reg_id VARCHAR(250) NOT NULL, ' +
-		'PRIMARY KEY (bed_id) ' +
+		'reg_id VARCHAR(250), ' +
+		'PRIMARY KEY (hospital_id, bed_id) ' +
 		');');
 }
 
-module.exports.get = function (bed_id, cb) {
-	sqlQuery = "SELECT * FROM devices WHERE bed_id = '" + bed_id + "';";
-
+module.exports.get_reg_id = function (hospital_id, bed_id, cb) {
+	console.log("id: " + hospital_id);
+	sqlQuery = "SELECT reg_id FROM devices WHERE bed_id = '" + bed_id + "' AND hospital_id = '"+ hospital_id +"';";
+	console.log("Query one: " + sqlQuery);
 	query_resposne_handler (sqlQuery, cb);
 }
 
@@ -48,11 +55,16 @@ module.exports.insert = function (bed_id, reg_id, cb) {
 
 ////////////////////////////////// HELPER METHODS /////////////////////
 function query_resposne_handler(query_string, cb) {
+	console.log("Query String: " + query_string);
 	connection.query(query_string, function (err, result) {
 		if (err != undefined) {
 			console.log("Database query error: " + err);
 		} 
 
+		console.log("Query result: " + result);
 		cb (err, result);
 	});
 }
+
+
+///////////////////////////////////////////////////////////////////////////

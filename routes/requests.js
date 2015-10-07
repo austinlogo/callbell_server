@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var registration = require('../business/registration');
 var gcm = require('../dao/gcmdao');
+var messages = require('../business/messages');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -22,30 +23,28 @@ router.post('/receive', function (req, res, next) {
 	var body = req.body;
 	console.log(req.body);
 
-	mysqlDao.get_reg_id(body['to'], function (err, result) {
-		if (err != null) {
-			console.log("error");
-			return;
-		}
-
-		var reg_id = result[0]['reg_id'];
-
-		gcm.send(reg_id, body['message'], body['from'], body['to'], function (resp) {
-			console.log(resp);
-			res.send(resp);
-		});
-
+	messages.route_message(body, function(resp) {
+		res.send(resp);
 	});
+	
+	// mysqlDao.get_reg_id(body['to'], function (err, result) {
+	// 	if (err != null) {
+	// 		console.log("error");
+	// 		return;
+	// 	}
+
+	// 	var reg_id = result[0]['reg_id'];
+
+	// 	gcm.send(reg_id, body['message'], body['from'], body['to'], function (resp) {
+	// 		console.log(resp);
+	// 		res.send(resp);
+	// 	});
+
+	// });
 
 	
 
 	
 });
-
-
-function default_response (json, res) {
-	res.send(json);
-} 
-
 
 module.exports = router;
