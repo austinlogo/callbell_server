@@ -1,4 +1,3 @@
-var TabletLocation = require('./TabletLocation');
 
 var category_key = "category";
 var payload_key = "payload"

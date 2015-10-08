@@ -29,7 +29,7 @@ module.exports.init = function() {
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS devices (' +
 		'hospital_id VARCHAR(20) NOT NULL, ' +
-		'bed_id VARCHAR(20) NOT NULL, ' +
+		'bed_id VARCHAR(50) NOT NULL, ' +
 		'reg_id VARCHAR(250), ' +
 		'PRIMARY KEY (hospital_id, bed_id) ' +
 		');');
@@ -48,8 +48,8 @@ module.exports.remove = function (key, cb) {
 	query_resposne_handler(removeRowQuery, cb);
 }
 
-module.exports.insert = function (bed_id, reg_id, cb) {
-	addDeviceQuery = "INSERT INTO devices (bed_id, reg_id) VALUES ('"+ bed_id +"', '"+ reg_id +"') ON DUPLICATE KEY UPDATE reg_id=VALUES(reg_id);";
+module.exports.insert = function (hospital_id, bed_id, reg_id, cb) {
+	addDeviceQuery = "INSERT INTO devices (hospital_id, bed_id, reg_id) VALUES ('"+ hospital_id +"', '"+ bed_id +"', '"+ reg_id +"') ON DUPLICATE KEY UPDATE reg_id=VALUES(reg_id);";
 	query_resposne_handler (addDeviceQuery, cb)
 }
 
