@@ -7,7 +7,11 @@ exports.save_registration = function (req_body, cb) {
 
 	console.log(registration_request);
 
-	mysqlDao.insert(registration_request.hospital_id, registration_request.bed_id, registration_request.reg_id, function(err, result) {
+	mysqlDao.insert(registration_request.state.hospital_id, 
+			registration_request.state.group_id, 
+			registration_request.state.location_id, 
+			registration_request.reg_id, function(err, result) {
+
 		if (err != undefined) {
 			console.log("error saving registration: " + error);
 		}

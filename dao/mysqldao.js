@@ -20,36 +20,41 @@ var connection = mysql.createConnection({
 });
 
 
-module.exports.reg_id_key = "reg_id";
-module.exports.hospital_id_key = "hospital_id";
-module.exports.bed_id_key = "bed_id";
+module.exports.reg_id_key = "REGISTRATION_ID";
+module.exports.hospital_id_key = "HOSPITAL_ID";
+module.exports.group_id = "GROUP_ID";
+module.exports.location_id_key = "LOCATION_ID";
 
 module.exports.init = function() {
 	connection.connect();
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS devices (' +
-		'hospital_id VARCHAR(20) NOT NULL, ' +
-		'bed_id VARCHAR(50) NOT NULL, ' +
-		'reg_id VARCHAR(250), ' +
-		'PRIMARY KEY (hospital_id, bed_id) ' +
+		'HOSPITAL_ID VARCHAR(50) NOT NULL, ' +
+		'GROUP_ID VARCHAR(50) NOT NULL, ' +
+		'LOCATION_ID VARCHAR(50) NOT NULL, ' +
+		'REGISTRATION_ID VARCHAR(250), ' +
+		'PRIMARY KEY (HOSPITAL_ID, GROUP_ID, LOCATION_ID) ' +
 		');');
 }
 
-module.exports.get_reg_id = function (hospital_id, bed_id, cb) {
+module.exports.get_reg_id = function (hospital_id, group_id, location_id, cb) {
 	console.log("id: " + hospital_id);
-	sqlQuery = "SELECT reg_id FROM devices WHERE bed_id = '" + bed_id + "' AND hospital_id = '"+ hospital_id +"';";
+	sqlQuery = "SELECT REGISTRATION_ID FROM devices WHERE LOCATION_ID = '" + location_id + "' AND GROUP_ID = '" + group_id + "' AND HOSPITAL_ID = '"+ hospital_id +"';";
 	console.log("Query one: " + sqlQuery);
 	query_resposne_handler (sqlQuery, cb);
 }
 
 module.exports.remove = function (key, cb) {
-	removeRowQuery = "DELETE FROM devices WHERE bed_id = '" + key + "';";
+	removeRowQuery = "DELETE FROM devices WHERE LOCATION_ID = '" + key + "';";
 
 	query_resposne_handler(removeRowQuery, cb);
 }
 
-module.exports.insert = function (hospital_id, bed_id, reg_id, cb) {
-	addDeviceQuery = "INSERT INTO devices (hospital_id, bed_id, reg_id) VALUES ('"+ hospital_id +"', '"+ bed_id +"', '"+ reg_id +"') ON DUPLICATE KEY UPDATE reg_id=VALUES(reg_id);";
+module.exports.insert = function (hospital_id, group_id, location_id, reg_id, cb) {
+	addDeviceQuery = "INSERT INTO devices (HOSPITAL_ID, GROUP_ID, LOCATION_ID, REGISTRATION_ID) "
+		+ "VALUES ('"+ hospital_id +"', '"+ group_id + "', '" + location_id +"', '"+ reg_id + "') "
+		+ "ON DUPLICATE KEY UPDATE REGISTRATION_ID=VALUES(REGISTRATION_ID);";
+	
 	query_resposne_handler (addDeviceQuery, cb)
 }
 

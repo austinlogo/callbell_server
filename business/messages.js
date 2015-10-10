@@ -9,9 +9,10 @@ exports.route_message = function(json, callback) {
 	async.waterfall([
 		//get destination registration_id
 		function(cb) {
-			mysqlDao.get_reg_id(message.hospital_id, message.to_id, function (err, result) {
-				console.log("query: " + result)
-				cb(err, result[0]['reg_id']);
+			mysqlDao.get_reg_id(message.state.hospital_id, message.state.group_id, message.to_id, function (err, result) {
+				console.log("query result: ");
+				console.log(result);
+				cb(err, result[0]['REGISTRATION_ID']);
 			});
 		},
 		//send message
