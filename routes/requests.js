@@ -25,26 +25,7 @@ router.post('/receive', function (req, res, next) {
 
 	messages.route_message(body, function(resp) {
 		res.send(resp);
-	});
-	
-	// mysqlDao.get_reg_id(body['to'], function (err, result) {
-	// 	if (err != null) {
-	// 		console.log("error");
-	// 		return;
-	// 	}
-
-	// 	var reg_id = result[0]['reg_id'];
-
-	// 	gcm.send(reg_id, body['message'], body['from'], body['to'], function (resp) {
-	// 		console.log(resp);
-	// 		res.send(resp);
-	// 	});
-
-	// });
-
-	
-
-	
+	});	
 });
 
 module.exports = router;

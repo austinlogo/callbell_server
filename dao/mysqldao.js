@@ -29,18 +29,34 @@ module.exports.init = function() {
 	connection.connect();
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS devices (' +
+		'DEVICE_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ' +
 		'HOSPITAL_ID VARCHAR(50) NOT NULL, ' +
 		'GROUP_ID VARCHAR(50) NOT NULL, ' +
 		'LOCATION_ID VARCHAR(50) NOT NULL, ' +
 		'REGISTRATION_ID VARCHAR(250), ' +
-		'PRIMARY KEY (HOSPITAL_ID, GROUP_ID, LOCATION_ID) ' +
+ 		'UNIQUE (HOSPITAL_ID, GROUP_ID, LOCATION_ID) ' +
+		');');
+
+	connection.query( 'CREATE TABLE IF NOT EXISTS states (' +
+		'DEVICE_ID INT NOT NULL PRIMARY KEY, ' +
+		'LOCATION_ID VARCHAR(50) NOT NULL, ' +
+		'PHYSICIAN VARCHAR(50), ' +
+		'NURSE VARCHAR(50), ' +
+		'RESIDENT VARCHAR(50), ' + 
+		'CHIEF_COMPLAINT VARCHAR(100) ' +
 		');');
 }
 
+
+		
+
 module.exports.get_reg_id = function (hospital_id, group_id, location_id, cb) {
-	console.log("id: " + hospital_id);
 	sqlQuery = "SELECT REGISTRATION_ID FROM devices WHERE LOCATION_ID = '" + location_id + "' AND GROUP_ID = '" + group_id + "' AND HOSPITAL_ID = '"+ hospital_id +"';";
-	console.log("Query one: " + sqlQuery);
+	query_resposne_handler (sqlQuery, cb);
+}
+
+module.exports.get_device_row = function (state, cb) {
+	sqlQuery = "SELECT * FROM devices WHERE LOCATION_ID = '" + state.location_id + "' AND GROUP_ID = '" + state.group_id + "' AND HOSPITAL_ID = '"+ state.hospital_id +"';";
 	query_resposne_handler (sqlQuery, cb);
 }
 
@@ -50,13 +66,33 @@ module.exports.remove = function (key, cb) {
 	query_resposne_handler(removeRowQuery, cb);
 }
 
-module.exports.insert = function (hospital_id, group_id, location_id, reg_id, cb) {
+module.exports.insert_devices = function (state, reg_id, cb) {
 	addDeviceQuery = "INSERT INTO devices (HOSPITAL_ID, GROUP_ID, LOCATION_ID, REGISTRATION_ID) "
-		+ "VALUES ('"+ hospital_id +"', '"+ group_id + "', '" + location_id +"', '"+ reg_id + "') "
-		+ "ON DUPLICATE KEY UPDATE REGISTRATION_ID=VALUES(REGISTRATION_ID);";
+			+ "VALUES ('"+ state.hospital_id +"', '"+ state.group_id + "', '" + state.location_id +"', '"+ reg_id + "') "
+			+ "ON DUPLICATE KEY UPDATE REGISTRATION_ID=VALUES(REGISTRATION_ID);";
 	
 	query_resposne_handler (addDeviceQuery, cb)
 }
+
+module.exports.insert_states = function( device_id, state, cb) {
+	var add_state_query = "INSERT INTO states (DEVICE_ID, LOCATION_ID, PHYSICIAN, NURSE, RESIDENT, CHIEF_COMPLAINT) "
+			+ "VALUES ( "
+				+ device_id + ", '"
+				+ state.location_id + "', '" 
+				+ state.physician_id + "', '"
+				+ state.nurse_id + "', '"
+				+ state.resident_id + "', '"
+				+ state.chief_complaint_id + "') "
+				+ "ON DUPLICATE KEY UPDATE "
+				+ "LOCATION_ID = '" + state.location_id + "', "
+				+ "PHYSICIAN = '" + state.physician_id + "', "
+ 				+ "NURSE = '" + state.nurse_id + "', "
+				+ "RESIDENT = '" + state.resident_id + "', "
+				+ "CHIEF_COMPLAINT = '" + state.chief_complaint_id + "' "
+				+ ";";
+
+	query_resposne_handler(add_state_query, cb)
+} 
 
 ////////////////////////////////// HELPER METHODS /////////////////////
 function query_resposne_handler(query_string, cb) {
@@ -66,7 +102,8 @@ function query_resposne_handler(query_string, cb) {
 			console.log("Database query error: " + err);
 		} 
 
-		console.log("Query result: " + result);
+		console.log("Query result: ");
+		console.log(result);
 		cb (err, result);
 	});
 }

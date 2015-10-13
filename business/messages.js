@@ -3,20 +3,49 @@ var Message = require('../models/Message');
 var mysqlDao = require('../dao/mysqldao');
 var gcm = require('../dao/gcmdao');
 
-exports.route_message = function(json, callback) {
+exports.route_message = function(json, master_callback) {
 	var message = new Message(json);
 
+	async.parallel([
+		function(cb) {
+			send_gcm_message(message, function(gcm_result) {
+				cb(gcm_result);
+			});
+		},
+		function(cb) {
+			update_states_table(message.state);
+		}
+	], function(err, result) {
+		master_callback(result[0]);
+	});
+};
+
+
+function send_gcm_message (message, cb) {
 	async.waterfall([
 		//get destination registration_id
 		function(cb) {
 			mysqlDao.get_reg_id(message.state.hospital_id, message.state.group_id, message.to_id, function (err, result) {
-				console.log("query result: ");
 				console.log(result);
+
+				if (result.length == 0) {
+
+				var error = {'error':'No Station Returned'};
+				cb(error, error);
+				return
+			}
 				cb(err, result[0]['REGISTRATION_ID']);
 			});
 		},
 		//send message
 		function(reg_id, cb) {
+			if (reg_id == undefined) {
+
+				var error = {'error':'Registration Empty'};
+				cb(error, error);
+				return
+			}
+
 			gcm.send_message(reg_id, message.payload, message.from_id, function (resp) {
 				console.log(resp);
 				cb (null, resp);
@@ -24,9 +53,31 @@ exports.route_message = function(json, callback) {
 		}
 	], function(err, result) {
 		if (err != undefined) {
-			console.log("Error in routing message: " + e);
+			console.log("Error in routing message: " + err);
 		}
 
-		callback(result);
+		cb(result);
 	});
-};
+}
+
+function update_states_table (state) {
+	
+	async.waterfall([
+		function(cb) {
+			mysqlDao.get_device_row(state, function(err, result) {
+				console.log("DEVICE: " + result[0]['DEVICE_ID']);
+				cb(err, result[0]['DEVICE_ID'])
+			});
+		},
+		function(device_id,cb) {
+			mysqlDao.insert_states(device_id, state, function(err, result) {
+				cb(err, result);
+			});
+		}
+	], function(err, result) {
+
+		console.log("err: " + err);
+		console.log("---RESULT---");
+		console.log(result);
+	});
+}
