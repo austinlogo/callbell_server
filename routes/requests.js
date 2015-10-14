@@ -28,4 +28,12 @@ router.post('/receive', function (req, res, next) {
 	});	
 });
 
+router.post('/getDeviceStates', function (req, res, next) {
+	var body = req.body;
+
+	messages.get_device_states(body, function(resp) {
+		res.send(resp);
+	});
+});
+
 module.exports = router;

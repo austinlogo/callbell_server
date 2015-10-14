@@ -91,8 +91,15 @@ module.exports.insert_states = function( device_id, state, cb) {
 				+ "CHIEF_COMPLAINT = '" + state.chief_complaint_id + "' "
 				+ ";";
 
-	query_resposne_handler(add_state_query, cb)
+	query_resposne_handler(add_state_query, cb);
 } 
+
+module.exports.get_device_states = function(state, cb) {
+	var devices_query = "SELECT DEVICE_ID from devices where HOSPITAL_ID = '" + state.hospital_id + "' AND GROUP_ID = '" + state.group_id + "' AND LOCATION_ID NOT LIKE '%_STATION%'";
+	var get_device_states_query = "SELECT LOCATION_ID, PHYSICIAN, NURSE, RESIDENT, CHIEF_COMPLAINT FROM states WHERE DEVICE_ID in (" + devices_query + ");";
+
+	query_resposne_handler(get_device_states_query, cb);
+}
 
 ////////////////////////////////// HELPER METHODS /////////////////////
 function query_resposne_handler(query_string, cb) {

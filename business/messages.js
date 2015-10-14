@@ -2,6 +2,7 @@ var async = require('async');
 var Message = require('../models/Message');
 var mysqlDao = require('../dao/mysqldao');
 var gcm = require('../dao/gcmdao');
+var State = require('../models/State');
 
 exports.route_message = function(json, master_callback) {
 	var message = new Message(json);
@@ -18,7 +19,21 @@ exports.route_message = function(json, master_callback) {
 	], function(err, result) {
 		master_callback(result[0]);
 	});
-};
+}
+
+exports.get_device_states = function (body, master_callback) {
+	var state = new State(body['state_id']);
+	console.log(state);
+	
+	mysqlDao.get_device_states(state, function(err, result) {
+		var resp_json = {
+			'error': err,
+			'stateList': result
+		}
+
+		master_callback(resp_json)
+	})
+}
 
 
 function send_gcm_message (message, cb) {
