@@ -45,10 +45,11 @@ function send_gcm_message (message, cb) {
 
 				if (result.length == 0) {
 
-				var error = {'error':'No Station Returned'};
-				cb(error, error);
-				return
-			}
+					var error = {'error':'No Station Returned'};
+					cb(error, error);
+					return
+				}
+
 				cb(err, result[0]['REGISTRATION_ID']);
 			});
 		},
@@ -61,7 +62,8 @@ function send_gcm_message (message, cb) {
 				return
 			}
 
-			gcm.send_message(reg_id, message.payload, message.from_id, function (resp) {
+			console.log("Sending Message from " + message.state.location_id);
+			gcm.send_message(reg_id, message.payload, message.state.location_id, function (resp) {
 				console.log(resp);
 				cb (null, resp);
 			});

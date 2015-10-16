@@ -7,6 +7,8 @@ module.exports.send_message = function(reg_id, msg, from, cb) {
     callback = cb;
     console.log('gcm send reg_id ' + reg_id)
     var len = 1;
+
+    console.log("\n\n\n\n\n\n\nFrom :" + from)
    
     request(
         { 
