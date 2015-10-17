@@ -28,6 +28,16 @@ router.post('/receive', function (req, res, next) {
 	});	
 });
 
+router.post('/updateState', function (req, res, next) {
+	var body = req.body;
+	console.log(body);
+
+	messages.update_state(body, function(resp) {
+		res.send(resp);
+	});
+	
+});
+
 router.post('/getDeviceStates', function (req, res, next) {
 	var body = req.body;
 

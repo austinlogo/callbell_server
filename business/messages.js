@@ -7,32 +7,77 @@ var State = require('../models/State');
 exports.route_message = function(json, master_callback) {
 	var message = new Message(json);
 
-	async.parallel([
+	send_gcm_message(message, function(gcm_result) {
+		master_callback(null, gcm_result);
+	});
+}
+
+exports.update_state = function (body, master_callback) {
+	console.log("HELLO");
+	console.log(State.id_key);
+	var state = new State(body[State.id_key]);
+	var message = new Message(body);
+
+	console.log(state);
+	
+	/*
+	 * Get Device Row
+	 * Insert updated State into new Row
+	 * get device state row
+	 * send message
+	 */
+	async.waterfall([
+		
 		function(cb) {
-			send_gcm_message(message, function(gcm_result) {
-				cb(gcm_result);
+			mysqlDao.get_device_row(state, function(err, result) {
+				console.log("DEVICE: " + result[0]['DEVICE_ID']);
+				cb(err, result[0])
 			});
 		},
-		function(cb) {
-			update_states_table(message.state);
+		function(device_row,cb) {
+			var device_id = device_row['DEVICE_ID'];
+			mysqlDao.insert_states(device_id, state, function (err, result) {
+				cb(err, device_id);
+			});
+		},
+		function(device_id, cb) {
+			mysqlDao.get_state_row_by_device_id(device_id, function (err, result) {
+				cb (err, result[0]);
+			});
+		},
+		function(device_row, cb) {
+			message.payload = device_row;
+			send_gcm_message(message, function(gcm_result) {
+				cb(null, gcm_result);
+			});
 		}
 	], function(err, result) {
-		master_callback(result[0]);
+
+		console.log("err: " + err);
+		console.log("---RESULT---");
+		console.log(result);
+		var resp = {
+			'error': err,
+			'result': result
+		}
+
+		master_callback(resp);
 	});
 }
 
 exports.get_device_states = function (body, master_callback) {
-	var state = new State(body['state_id']);
+	var state = new State(body[State.id_key]);
+	console.log("STATE: ");
 	console.log(state);
 	
-	mysqlDao.get_device_states(state, function(err, result) {
+	mysqlDao.get_device_states_for_group(state, function(err, result) {
 		var resp_json = {
 			'error': err,
 			'stateList': result
 		}
 
-		master_callback(resp_json)
-	})
+		master_callback(resp_json);
+	});
 }
 
 
@@ -63,38 +108,20 @@ function send_gcm_message (message, cb) {
 			}
 
 			console.log("Sending Message from " + message.state.location_id);
-			gcm.send_message(reg_id, message.payload, message.state.location_id, function (resp) {
+			console.log("CATEGORY: " + message.category);
+			gcm.send_message(reg_id, message.payload, message.category, message.state.location_id, function (resp) {
 				console.log(resp);
 				cb (null, resp);
 			});
 		}
 	], function(err, result) {
 		if (err != undefined) {
-			console.log("Error in routing message: " + err);
+			console.log("Error in routing message: ");
+			console.log(err);
+			cb(err);
 		}
 
 		cb(result);
 	});
 }
 
-function update_states_table (state) {
-	
-	async.waterfall([
-		function(cb) {
-			mysqlDao.get_device_row(state, function(err, result) {
-				console.log("DEVICE: " + result[0]['DEVICE_ID']);
-				cb(err, result[0]['DEVICE_ID'])
-			});
-		},
-		function(device_id,cb) {
-			mysqlDao.insert_states(device_id, state, function(err, result) {
-				cb(err, result);
-			});
-		}
-	], function(err, result) {
-
-		console.log("err: " + err);
-		console.log("---RESULT---");
-		console.log(result);
-	});
-}

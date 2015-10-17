@@ -3,12 +3,12 @@ var request = require('request');
 var gcm_url = 'https://gcm-http.googleapis.com/gcm/send'
 var callback
 
-module.exports.send_message = function(reg_id, msg, from, cb) {
+module.exports.send_message = function(reg_id, msg, category, from, cb) {
     callback = cb;
     console.log('gcm send reg_id ' + reg_id)
-    var len = 1;
 
-    console.log("\n\n\n\n\n\n\nFrom :" + from)
+    console.log("payload: ");
+    console.log(msg);
    
     request(
         { 
@@ -21,6 +21,7 @@ module.exports.send_message = function(reg_id, msg, from, cb) {
             body:   JSON.stringify({
                         "to" : reg_id,
                         "data" : {
+                            "category_id": category,
                             "message": msg,
                             "bed_id": from
                         }

@@ -60,6 +60,11 @@ module.exports.get_device_row = function (state, cb) {
 	query_resposne_handler (sqlQuery, cb);
 }
 
+module.exports.get_state_row_by_device_id = function (device_id, cb) {
+	sqlQuery = "SELECT * FROM states left join devices on states.DEVICE_ID = devices.DEVICE_ID WHERE states.DEVICE_ID = " + device_id + ";";
+	query_resposne_handler (sqlQuery, cb);
+}
+
 module.exports.remove = function (key, cb) {
 	removeRowQuery = "DELETE FROM devices WHERE LOCATION_ID = '" + key + "';";
 
@@ -94,9 +99,9 @@ module.exports.insert_states = function( device_id, state, cb) {
 	query_resposne_handler(add_state_query, cb);
 } 
 
-module.exports.get_device_states = function(state, cb) {
+module.exports.get_device_states_for_group = function(state, cb) {
 	var devices_query = "SELECT DEVICE_ID from devices where HOSPITAL_ID = '" + state.hospital_id + "' AND GROUP_ID = '" + state.group_id + "' AND LOCATION_ID NOT LIKE '%_STATION%'";
-	var get_device_states_query = "SELECT LOCATION_ID, PHYSICIAN, NURSE, RESIDENT, CHIEF_COMPLAINT FROM states WHERE DEVICE_ID in (" + devices_query + ");";
+	var get_device_states_query = "SELECT * FROM states left join devices on states.DEVICE_ID = devices.DEVICE_ID WHERE states.DEVICE_ID in (" + devices_query + ");";
 
 	query_resposne_handler(get_device_states_query, cb);
 }
