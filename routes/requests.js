@@ -28,6 +28,7 @@ router.post('/receive', function (req, res, next) {
 	});	
 });
 
+//This comes from the Bed tablet
 router.post('/updateState', function (req, res, next) {
 	var body = req.body;
 	console.log(body);
@@ -35,7 +36,7 @@ router.post('/updateState', function (req, res, next) {
 	messages.update_state(body, function(resp) {
 		res.send(resp);
 	});
-	
+
 });
 
 router.post('/getDeviceStates', function (req, res, next) {
