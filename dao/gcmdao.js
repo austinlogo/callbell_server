@@ -34,5 +34,8 @@ module.exports.send_message = function(reg_id, msg, category, from, cb) {
 function gcm_response_callback (error, response, body) {
     console.log("GCM Send Response: " + JSON.stringify(response));
     console.log("GCM Send body: " + body);
-    callback({'GCM Send StatusCode ': response['statusCode'], "Error: ": error});
+    var responseStr = response.hasOwnProperty('statusCode') 
+            ? response['statusCode']
+            : "No Response"
+    callback({'GCM Send StatusCode ': responseStr, "Error: ": error});
 }
