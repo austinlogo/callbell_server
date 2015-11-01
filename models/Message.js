@@ -1,9 +1,9 @@
 var State = require('./State');
 
-var state_key = "state_id";
-var category_key = "category_id";
-var payload_key = "payload_id"
-var to_id_key = "to_id";
+var state_key = "STATE_ID";
+var category_key = "CATEGORY_ID";
+var payload_key = "PAYLOAD_ID"
+var to_id_key = "TO_ID";
 
 var Message = function(json) {
 	this.state = new State(json[state_key])

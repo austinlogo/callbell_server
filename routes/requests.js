@@ -47,4 +47,6 @@ router.post('/getDeviceStates', function (req, res, next) {
 	});
 });
 
+
+
 module.exports = router;

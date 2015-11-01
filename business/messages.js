@@ -85,7 +85,7 @@ function send_gcm_message (message, cb) {
 	async.waterfall([
 		//get destination registration_id
 		function(cb) {
-			mysqlDao.get_reg_id(message.state.hospital_id, message.state.group_id, message.to_id, function (err, result) {
+			mysqlDao.get_reg_id(message.state.HOSPITAL_ID, message.state.GROUP_ID, message.to_id, function (err, result) {
 				console.log(result);
 
 				if (result.length == 0) {
@@ -107,9 +107,9 @@ function send_gcm_message (message, cb) {
 				return
 			}
 
-			console.log("Sending Message from " + message.state.location_id);
+			console.log("Sending Message from " + message.state.LOCATION_ID);
 			console.log("CATEGORY: " + message.category);
-			gcm.send_message(reg_id, message.payload, message.category, message.state.location_id, function (resp) {
+			gcm.send_message(reg_id, message.state, message.payload, message.category, message.state.LOCATION_ID, function (resp) {
 				console.log(resp);
 				cb (null, resp);
 			});
@@ -119,6 +119,7 @@ function send_gcm_message (message, cb) {
 			console.log("Error in routing message: ");
 			console.log(err);
 			cb(err);
+			
 		}
 
 		cb(result);

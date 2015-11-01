@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var requests = require('./routes/requests');
 var app = express();
 var mysqlDao = require('./dao/mysqldao');
+var http = require('http');
+
 
 //Initialize the Database
 mysqlDao.init();
