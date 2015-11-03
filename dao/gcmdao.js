@@ -36,41 +36,51 @@ var clients = [];
 //   io.emit("message", msg);
 // }
 
-module.exports.test = function() {
-    sockets.test();
+module.exports.send_message = function (loc_id, state, msg, category, from, cb) {
+    var payload = JSON.stringify({
+        "to" : loc_id,
+        "data" : {
+            "CATEGORY_ID": category,
+            "PAYLOAD_ID": msg,
+            "STATE_ID": state,
+            "BED_ID": from
+        }
+    });
+
+    sockets.send_message_to_device(loc_id, payload);
 }
 
 
 // OLD COMM METHODS
 
-module.exports.send_message = function(reg_id, state, msg, category, from, cb) {
-    callback = cb;
-    console.log('gcm send reg_id ' + reg_id)
+// module.exports.send_message = function(reg_id, state, msg, category, from, cb) {
+//     callback = cb;
+//     console.log('gcm send reg_id ' + reg_id)
 
-    console.log("payload: ");
-    console.log(msg);
+//     console.log("payload: ");
+//     console.log(msg);
    
-    request(
-        { 
-            method: 'POST',
-            uri: 'https://gcm-http.googleapis.com/gcm/send',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization':'key=AIzaSyBdc10A1Cy7fsYy-ocn5wwXC1Ne5GYQMgc'
-            },
-            body:   JSON.stringify({
-                        "to" : reg_id,
-                        "data" : {
-                            "CATEGORY_ID": category,
-                            "PAYLOAD_ID": msg,
-                            "STATE_ID": state,
-                            "BED_ID": from
-                        }
-                    })
-        }
-        , gcm_response_callback
-      )
-}
+//     request(
+//         { 
+//             method: 'POST',
+//             uri: 'https://gcm-http.googleapis.com/gcm/send',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization':'key=AIzaSyBdc10A1Cy7fsYy-ocn5wwXC1Ne5GYQMgc'
+//             },
+//             body:   JSON.stringify({
+//                         "to" : reg_id,
+//                         "data" : {
+//                             "CATEGORY_ID": category,
+//                             "PAYLOAD_ID": msg,
+//                             "STATE_ID": state,
+//                             "BED_ID": from
+//                         }
+//                     })
+//         }
+//         , gcm_response_callback
+//       )
+// }
 
 function gcm_response_callback (error, response, body) {
     console.log("GCM Send Response: " + JSON.stringify(response));

@@ -85,7 +85,7 @@ function send_gcm_message (message, cb) {
 	async.waterfall([
 		//get destination registration_id
 		function(cb) {
-			mysqlDao.get_reg_id(message.state.HOSPITAL_ID, message.state.GROUP_ID, message.to_id, function (err, result) {
+			mysqlDao.get_loc_id(message.state.HOSPITAL_ID, message.state.GROUP_ID, message.to_id, function (err, result) {
 				console.log(result);
 
 				if (result.length == 0) {
@@ -95,12 +95,12 @@ function send_gcm_message (message, cb) {
 					return
 				}
 
-				cb(err, result[0]['REGISTRATION_ID']);
+				cb(err, result[0]['LOCATION_ID']);
 			});
 		},
 		//send message
-		function(reg_id, cb) {
-			if (reg_id == undefined) {
+		function(loc_id, cb) {
+			if (loc_id == undefined) {
 
 				var error = {'error':'Registration Empty'};
 				cb(error, error);
@@ -109,7 +109,7 @@ function send_gcm_message (message, cb) {
 
 			console.log("Sending Message from " + message.state.LOCATION_ID);
 			console.log("CATEGORY: " + message.category);
-			gcm.send_message(reg_id, message.state, message.payload, message.category, message.state.LOCATION_ID, function (resp) {
+			gcm.send_message(loc_id, message.state, message.payload, message.category, message.state.LOCATION_ID, function (resp) {
 				console.log(resp);
 				cb (null, resp);
 			});

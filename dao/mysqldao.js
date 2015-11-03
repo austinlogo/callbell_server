@@ -51,8 +51,8 @@ module.exports.init = function() {
 
 		
 
-module.exports.get_reg_id = function (hospital_id, group_id, location_id, cb) {
-	sqlQuery = "SELECT REGISTRATION_ID FROM devices WHERE LOCATION_ID = '" + location_id + "' AND GROUP_ID = '" + group_id + "' AND HOSPITAL_ID = '"+ hospital_id +"';";
+module.exports.get_loc_id = function (hospital_id, group_id, location_id, cb) {
+	sqlQuery = "SELECT LOCATION_ID FROM devices WHERE LOCATION_ID = '" + location_id + "' AND GROUP_ID = '" + group_id + "' AND HOSPITAL_ID = '"+ hospital_id +"';";
 	query_resposne_handler (sqlQuery, cb);
 }
 
