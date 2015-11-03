@@ -4,9 +4,7 @@
  * Module dependencies.
  */
 
-var app = require('../app');
 var debug = require('debug')('CallBell:server');
-var http = require('http');
 
 
 

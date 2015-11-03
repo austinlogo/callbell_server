@@ -4,6 +4,9 @@ var registration = require('../business/registration');
 var gcm = require('../dao/gcmdao');
 var messages = require('../business/messages');
 
+
+
+
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index');
@@ -12,6 +15,7 @@ router.get('/', function (req, res, next) {
 //Registration request for new devices and devices updating their tokens
 router.post('/register', function (req, res, next) {
 	console.log ("registration request");
+	console.log(req.body);
 
 	registration.save_registration(req.body, function(json) {
 		res.send(json);

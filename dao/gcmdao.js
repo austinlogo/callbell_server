@@ -1,7 +1,47 @@
 var request = require('request');
+var sockets = require('../sockets');
 
 var gcm_url = 'https://gcm-http.googleapis.com/gcm/send'
 var callback
+
+
+var clients = [];
+
+// io.on('connection', function (socket){
+//   console.log('a user connected');
+
+//   console.log(clients);
+
+//   socket.on("event", function(msg){
+//     console.log("Hello_world");
+//     send_message("message received");
+
+//   });
+
+//   socket.on("add", function (msg) {
+//     socket.user = msg;
+//     clients[msg] = socket;
+//     console.log("Socket: " + socket);
+  
+//     clients[msg].emit('message', 'You have been added');
+//     console.log(clients);
+//   });
+
+//   socket.on("ping", function (to) {
+//     clients[to].emit('message', "Someone is pinging you :)");
+//   });
+// });
+
+// function send_message (msg) {
+//   io.emit("message", msg);
+// }
+
+module.exports.test = function() {
+    sockets.test();
+}
+
+
+// OLD COMM METHODS
 
 module.exports.send_message = function(reg_id, state, msg, category, from, cb) {
     callback = cb;
