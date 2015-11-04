@@ -13,12 +13,11 @@ exports.route_message = function(json, master_callback) {
 }
 
 exports.update_state = function (body, master_callback) {
-	console.log("HELLO");
-	console.log(State.id_key);
+
 	var state = new State(body[State.id_key]);
 	var message = new Message(body);
 
-	console.log(state);
+	console.log(message);
 	
 	/*
 	 * Get Device Row
@@ -47,6 +46,7 @@ exports.update_state = function (body, master_callback) {
 		},
 		function(device_row, cb) {
 			message.payload = device_row;
+			console.log("Send message to " + message.to_id);
 			send_gcm_message(message, function(gcm_result) {
 				cb(null, gcm_result);
 			});
@@ -85,7 +85,7 @@ function send_gcm_message (message, cb) {
 	async.waterfall([
 		//get destination registration_id
 		function(cb) {
-			mysqlDao.get_loc_id(message.state.HOSPITAL_ID, message.state.GROUP_ID, message.to_id, function (err, result) {
+			mysqlDao.get_reg_id(message.state.HOSPITAL_ID, message.state.GROUP_ID, message.to_id, function (err, result) {
 				console.log(result);
 
 				if (result.length == 0) {
@@ -95,7 +95,7 @@ function send_gcm_message (message, cb) {
 					return
 				}
 
-				cb(err, result[0]['LOCATION_ID']);
+				cb(err, result[0]['REGISTRATION_ID']);
 			});
 		},
 		//send message

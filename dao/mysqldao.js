@@ -51,8 +51,8 @@ module.exports.init = function() {
 
 		
 
-module.exports.get_loc_id = function (hospital_id, group_id, location_id, cb) {
-	sqlQuery = "SELECT LOCATION_ID FROM devices WHERE LOCATION_ID = '" + location_id + "' AND GROUP_ID = '" + group_id + "' AND HOSPITAL_ID = '"+ hospital_id +"';";
+module.exports.get_reg_id = function (hospital_id, group_id, location_id, cb) {
+	sqlQuery = "SELECT REGISTRATION_ID FROM devices WHERE LOCATION_ID = '" + location_id + "' AND GROUP_ID = '" + group_id + "' AND HOSPITAL_ID = '"+ hospital_id +"';";
 	query_resposne_handler (sqlQuery, cb);
 }
 
@@ -103,7 +103,7 @@ module.exports.insert_states = function( device_id, state, cb) {
 } 
 
 module.exports.get_device_states_for_group = function(state, cb) {
-	var devices_query = "SELECT DEVICE_ID from devices where HOSPITAL_ID = '" + state.HOSPITAL_ID + "' AND GROUP_ID = '" + state.GROUP_ID + "' AND LOCATION_ID NOT LIKE '%_STATION%'";
+	var devices_query = "SELECT DEVICE_ID from devices where HOSPITAL_ID = '" + state.HOSPITAL_ID + "' AND GROUP_ID = '" + state.GROUP_ID + "' AND LOCATION_ID NOT LIKE '%STATION%'";
 	var get_device_states_query = "SELECT * FROM states left join devices on states.DEVICE_ID = devices.DEVICE_ID WHERE states.DEVICE_ID in (" + devices_query + ");";
 
 	query_resposne_handler(get_device_states_query, cb);
