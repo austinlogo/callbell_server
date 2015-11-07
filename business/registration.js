@@ -1,6 +1,7 @@
 var mysqlDao = require('../dao/mysqldao');
 var async = require('async');
 var RegistrationRequest = require('../models/RegistrationRequest');
+var messages = require('../business/messages');
 
 //saves registration and returns the response in the callback
 exports.save_registration = function (req_body, master_callback) {
@@ -44,4 +45,10 @@ exports.save_registration = function (req_body, master_callback) {
 		});
 
 	
+}
+
+exports.toggleRegister = function (reg_id, isConnected, master_callback) {
+	mysqlDao.set_device_connection(reg_id, isConnected, function() {
+		return master_callback();
+	});
 }

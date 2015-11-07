@@ -44,7 +44,7 @@ function init_listeners() {
 				console.log("clients: " + Object.size(clients));
 
 				registration.save_registration(json, function(json) {
-					// res.send(json);
+
 				});	
 			});
 		
@@ -53,8 +53,11 @@ function init_listeners() {
 
 		socket.on("UNREGISTER", function (client_id) {
 			console.log("unregistering " + client_id);
-			delete clients[client_id];
-			console.log("Client List: " + Object.size(clients));
+
+			remove_user(client_id, socket, function() {
+				console.log("Client List: " + Object.size(clients));
+				registration.toggleRegister(client_id, false);
+			});
 		});
 
 		socket.on("RECEIVE", function (request) {
@@ -70,25 +73,30 @@ function init_listeners() {
 			console.log(body);
 
 			messages.update_state(body, function(resp) {
-				// res.send(resp);
+
 			});
 		});
 
 		socket.on("UPDATE_STATE", function	(request) {
 			var body = JSON.parse(request);
 
-			messages.get_device_states(body, function(resp) {
-				// res.send(resp);
+			messages.get_device_states(body, clients, function(resp) {
+
 			});
 		});
 		
 		socket.on("ping", function (to) {
-			if (!clients.hasOwnProperty(to)) {
-				console.log("Adding user: " + to);
-			}
+			var isAdded = clients.hasOwnProperty(to);
 
 			add_user(to, socket, function() {
-				clients[to].emit("pong", "");	
+				clients[to].emit("pong", "");
+
+				if (!isAdded) {
+					console.log("Added user: " + to);
+					registration.toggleRegister(to, true, function () {
+						return;						
+					});
+				}
 			});
 		});
 
@@ -107,11 +115,18 @@ module.exports.send_message_to_device = function (location_id, payload) {
 	}
 }
 
-function add_user(client, socket, cb) {
+function add_user (client, socket, cb) {
 	clients[client] = socket;
 	sockets[socket] = client; 
 
 	return cb();
+}
+
+function remove_user (client, socket, cb) {
+	delete clients[client];
+	delete sockets[socket];
+
+	cb();
 }
 
 

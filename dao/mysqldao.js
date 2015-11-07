@@ -11,6 +11,7 @@
 */
 
 var mysql = require('mysql');
+var State = require('../models/State');
 
 var connection = mysql.createConnection({
 	host 		: 'localhost',
@@ -44,7 +45,8 @@ module.exports.init = function() {
 		'NURSE_ID VARCHAR(50), ' +
 		'RESIDENT_ID VARCHAR(50), ' + 
 		'CHIEF_COMPLAINT_ID VARCHAR(100), ' +
-		'PAIN_RATING_ID INT' +
+		'PAIN_RATING_ID INT, ' +
+		'CONNECTION_INDICATOR_ID BOOLEAN' +
 		');');
 }
 
@@ -80,8 +82,33 @@ module.exports.insert_devices = function (state, reg_id, cb) {
 	query_resposne_handler (addDeviceQuery, cb)
 }
 
+module.exports.set_device_connection = function(reg_id, connection_status, cb) {
+	get_device_id_query = "SELECT DEVICE_ID FROM devices where REGISTRATION_ID = '" + reg_id + "'";
+	connection_query = "UPDATE states SET CONNECTION_INDICATOR_ID = " + connection_status + " WHERE DEVICE_ID in (" + get_device_id_query + ");";
+
+	query_resposne_handler(connection_query, cb); 
+}
+
+module.exports.get_tablet_station_name = function (reg_id, cb) {
+	get_device_row = "SELECT * FROM devices where REGISTRATION_ID = '" + reg_id + "';";
+
+	internal_query(get_device_row, function (err, result) {
+		if (err != undefined) {
+			console.log("send_connection_status_to_station error");
+			console.log(err);
+		}
+
+		var state = new State(result[0]);
+
+		cb(state.STATION_NAME, state);
+
+
+	});
+
+}
+
 module.exports.insert_states = function( device_id, state, cb) {
-	var add_state_query = "INSERT INTO states (DEVICE_ID, LOCATION_ID, PHYSICIAN_ID, NURSE_ID, RESIDENT_ID, CHIEF_COMPLAINT_ID, PAIN_RATING_ID) "
+	var add_state_query = "INSERT INTO states (DEVICE_ID, LOCATION_ID, PHYSICIAN_ID, NURSE_ID, RESIDENT_ID, CHIEF_COMPLAINT_ID, PAIN_RATING_ID, CONNECTION_INDICATOR_ID) "
 			+ "VALUES ( "
 				+ device_id + ", '"
 				+ state.LOCATION_ID + "', '" 
@@ -89,18 +116,25 @@ module.exports.insert_states = function( device_id, state, cb) {
 				+ state.NURSE_ID + "', '"
 				+ state.RESIDENT_ID + "', '"
 				+ state.CHIEF_COMPLAINT_ID + "', "
-				+ state.PAIN_RATING_ID + ") "
-				+ "ON DUPLICATE KEY UPDATE "
-				+ "LOCATION_ID = '" + state.LOCATION_ID + "', "
-				+ "PHYSICIAN_ID = '" + state.PHYSICIAN_ID + "', "
- 				+ "NURSE_ID = '" + state.NURSE_ID + "', "
-				+ "RESIDENT_ID = '" + state.RESIDENT_ID + "', "
-				+ "CHIEF_COMPLAINT_ID = '" + state.CHIEF_COMPLAINT_ID + "', "
-				+ "PAIN_RATING_ID = " + state.PAIN_RATING_ID
-				+ ";";
+				+ state.PAIN_RATING_ID + ", "
+				+ state.CONNECTION_INDICATOR_ID 
+			+ ") "
+			+ "ON DUPLICATE KEY UPDATE "
+			+ "LOCATION_ID = '" + state.LOCATION_ID + "', "
+			+ "PHYSICIAN_ID = '" + state.PHYSICIAN_ID + "', "
+			+ "NURSE_ID = '" + state.NURSE_ID + "', "
+			+ "RESIDENT_ID = '" + state.RESIDENT_ID + "', "
+			+ "CHIEF_COMPLAINT_ID = '" + state.CHIEF_COMPLAINT_ID + "', "
+			+ "PAIN_RATING_ID = " + state.PAIN_RATING_ID + ", "
+			+ "CONNECTION_INDICATOR_ID = " + state.CONNECTION_INDICATOR_ID
+			+ ";";
 
 	query_resposne_handler(add_state_query, cb);
 } 
+
+module.exports.get_device_station = function(reg_id, cb) {
+	return;
+}
 
 module.exports.get_device_states_for_group = function(state, cb) {
 	var devices_query = "SELECT DEVICE_ID from devices where HOSPITAL_ID = '" + state.HOSPITAL_ID + "' AND GROUP_ID = '" + state.GROUP_ID + "' AND LOCATION_ID NOT LIKE '%STATION%'";
@@ -119,6 +153,17 @@ function query_resposne_handler(query_string, cb) {
 
 		console.log("Query result: ");
 		console.log(result);
+		cb (err, result);
+	});
+}
+
+function internal_query(query_string, cb) {
+	console.log("Query String: " + query_string);
+	connection.query(query_string, function (err, result) {
+		if (err != undefined) {
+			console.log("Database query error: " + err);
+		} 
+
 		cb (err, result);
 	});
 }
