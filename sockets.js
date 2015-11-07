@@ -77,6 +77,9 @@ function init_listeners() {
 		
 		socket.on("ping", function (to) {
 			if (!clients.hasOwnProperty(to)) {
+				console.log("Adding user: " + to);
+				clients[to] = socket;
+			} else {
 				clients[to] = socket;
 			}
 
