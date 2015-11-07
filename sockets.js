@@ -7,6 +7,7 @@ var messages = require('./business/messages');
 var io;
 var socket;
 var clients;
+var sockets;
 
 Object.size = function(obj) {
     var size = 0, key;
@@ -19,6 +20,7 @@ Object.size = function(obj) {
 exports.listen = function(server){
     io = socketio.listen(server);
     clients = [];
+    sockets = [];
     value = "initialized";
 
     init_listeners();
@@ -26,8 +28,7 @@ exports.listen = function(server){
 
 function init_listeners() {
 
-	io.on('connection', function (sock){
-		var socket = sock;
+	io.on('connection', function (socket){
 		console.log('a user connected');
 
 		socket.on("REGISTER", function (request) {
@@ -35,13 +36,19 @@ function init_listeners() {
 			var client_id = json['REGISTRATION_ID'];
 
 			console.log("adding " + client_id);
-			clients[client_id] = socket;
-			clients[client_id].emit('CONFIRMATION', 'true');
-			console.log("clients: " + Object.size(clients));
+			// clients[client_id] = socket;
+			// sockets[socket] = client_id;
 
-			registration.save_registration(json, function(json) {
-				// res.send(json);
+			add_user(client_id, socket, function() {
+				clients[client_id].emit('CONFIRMATION', 'true');
+				console.log("clients: " + Object.size(clients));
+
+				registration.save_registration(json, function(json) {
+					// res.send(json);
+				});	
 			});
+		
+			
 		});
 
 		socket.on("UNREGISTER", function (client_id) {
@@ -78,12 +85,15 @@ function init_listeners() {
 		socket.on("ping", function (to) {
 			if (!clients.hasOwnProperty(to)) {
 				console.log("Adding user: " + to);
-				clients[to] = socket;
-			} else {
-				clients[to] = socket;
 			}
 
-			clients[to].emit("pong", "");
+			add_user(to, socket, function() {
+				clients[to].emit("pong", "");	
+			});
+		});
+
+		socket.on("disconnect", function () {
+			console.log("inner socket disconnect of " + sockets[socket]);
 		});
 	});
 }
@@ -95,6 +105,13 @@ module.exports.send_message_to_device = function (location_id, payload) {
 	} else {
 		console.log(location_id + " is not a registered device.");
 	}
+}
+
+function add_user(client, socket, cb) {
+	clients[client] = socket;
+	sockets[socket] = client; 
+
+	return cb();
 }
 
 
