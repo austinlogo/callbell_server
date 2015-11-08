@@ -35,10 +35,6 @@ function init_listeners() {
 			var json = JSON.parse(request);
 			var client_id = json['REGISTRATION_ID'];
 
-			console.log("adding " + client_id);
-			// clients[client_id] = socket;
-			// sockets[socket] = client_id;
-
 			add_user(client_id, socket, function() {
 				clients[client_id].emit('CONFIRMATION', 'true');
 				console.log("clients: " + Object.size(clients));
@@ -56,7 +52,7 @@ function init_listeners() {
 
 			remove_user(client_id, socket, function() {
 				console.log("Client List: " + Object.size(clients));
-				registration.toggleRegister(client_id, false);
+				// registration.toggleRegister(client_id, false);
 			});
 		});
 
@@ -89,10 +85,16 @@ function init_listeners() {
 			var isAdded = clients.hasOwnProperty(to);
 
 			add_user(to, socket, function() {
-				clients[to].emit("pong", "");
+
+				if (to.indexOf('STATION') > 0) {
+					clients[to].emit("pong", JSON.stringify(Object.keys(clients)));
+				} else {
+					clients[to].emit("pong", "");
+				}
+
+				
 
 				if (!isAdded) {
-					console.log("Added user: " + to);
 					registration.toggleRegister(to, true, function () {
 						return;						
 					});
@@ -119,12 +121,18 @@ function add_user (client, socket, cb) {
 	clients[client] = socket;
 	sockets[socket] = client; 
 
+	console.log("Added User: " + client);
+	console.log(Object.keys(clients));
+
 	return cb();
 }
 
 function remove_user (client, socket, cb) {
 	delete clients[client];
 	delete sockets[socket];
+
+	console.log("Removed user: " + client);
+	console.log(Object.keys(clients));
 
 	cb();
 }
