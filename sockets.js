@@ -103,7 +103,8 @@ function init_listeners() {
 		});
 
 		socket.on("disconnect", function () {
-			console.log("inner socket disconnect of " + sockets[socket]);
+			console.log("on disconnect of " + sockets[socket]);
+			socket.emit("SERVER_DISCONNECT", sockets[socket]);
 		});
 	});
 }
