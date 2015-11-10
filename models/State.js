@@ -22,7 +22,7 @@ State = function (json) {
 	this.NURSE_ID = json[NURSE_KEY] == undefined ? '' : json[NURSE_KEY];
 	this.RESIDENT_ID = json[RESIDENT_KEY] == undefined ? '' : json[RESIDENT_KEY];
 	this.CHIEF_COMPLAINT_ID = json[CHIEF_COMPLAINT_KEY] == undefined ? '' : json[CHIEF_COMPLAINT_KEY];
-	this.PAIN_RATING_ID = json[PAIN_RATING_KEY] == undefined ? 0 : json[PAIN_RATING_KEY];
+	this.PAIN_RATING_ID = json[PAIN_RATING_KEY] == undefined ? 1 : json[PAIN_RATING_KEY];
 	this.CONNECTION_INDICATOR_ID = json[CONNECTED_INDICATOR] == undefined 
 			? true
 			: json[CONNECTED_INDICATOR];

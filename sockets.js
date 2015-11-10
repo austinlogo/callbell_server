@@ -64,6 +64,16 @@ function init_listeners() {
 			});	
 		});
 
+		socket.on("UPDATE_STATE_AND_SEND_REQUEST", function (request) {
+			console.log("UPDATE_STATE_AND_SEND_REQUEST");
+			var jsonRequest = JSON.parse(request);
+
+			messages.update_state(jsonRequest, function(resp) {});
+			messages.route_message(jsonRequest, function(resp) {});
+
+
+		});
+
 		socket.on("GET_DEVICE_STATES", function (request) {
 			var body = JSON.parse(request);
 			console.log(body);
