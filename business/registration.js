@@ -1,18 +1,16 @@
 var mysqlDao = require('../dao/mysqldao');
 var async = require('async');
-var RegistrationRequest = require('../models/RegistrationRequest');
 var messages = require('../business/messages');
 
 //saves registration and returns the response in the callback
-exports.save_registration = function (req_body, master_callback) {
-	var registration_request = new RegistrationRequest(req_body);
+exports.save_registration = function (state, master_callback) {
 
-	console.log(registration_request);
+	console.log(state);
 
 	async.waterfall([
 		function(cb) {
-			mysqlDao.insert_devices(registration_request.state, 
-					registration_request.reg_id, 
+			mysqlDao.insert_devices(state, 
+					state.TABLET_NAME, 
 					function(err, result) {
 
 				if (err != undefined) {
@@ -25,13 +23,13 @@ exports.save_registration = function (req_body, master_callback) {
 			});
 		},
 		function(response_json, cb) {
-			mysqlDao.get_device_row(registration_request.state, function(err, result) {
+			mysqlDao.get_device_row(state, function(err, result) {
 				console.log("DEVICE: " + result[0]['DEVICE_ID']);
 				cb(err, result[0]['DEVICE_ID'])
 			});
 		},
 		function(device_id, cb) {
-			mysqlDao.insert_states(device_id, registration_request.state, function(err, result) {
+			mysqlDao.insert_states(device_id, state, function(err, result) {
 				cb(err, result);
 			});
 		}

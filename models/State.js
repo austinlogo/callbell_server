@@ -7,6 +7,8 @@ var RESIDENT_KEY = "RESIDENT_ID";
 var CHIEF_COMPLAINT_KEY = "CHIEF_COMPLAINT_ID";
 var PAIN_RATING_KEY = "PAIN_RATING_ID";
 var CONNECTED_INDICATOR = "CONNECTION_INDICATOR_ID";
+var TABLET_NAME_ID = "TABLE_NAME_ID";
+var STATION_TABLET_NAME_ID = "STATION_TABLET_NAME_ID";
 
 var State;
 
@@ -26,9 +28,8 @@ State = function (json) {
 	this.CONNECTION_INDICATOR_ID = json[CONNECTED_INDICATOR] == undefined 
 			? 1
 			: json[CONNECTED_INDICATOR];
-
-	this.TABLET_NAME = this.HOSPITAL_ID + "_" + this.GROUP_ID + "_" + this.LOCATION_ID;
-	this.STATION_NAME = this.HOSPITAL_ID + "_" + this.GROUP_ID + "_" + station_title;
+	this.TABLET_NAME = json[TABLET_NAME_ID] == undefined ? '' : json[TABLET_NAME_ID];
+	this.STATION_NAME = json[STATION_TABLET_NAME_ID] == undefined ? '' : json[STATION_TABLET_NAME_ID];
 }
 
 State.id_key = 'STATE_ID';

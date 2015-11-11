@@ -1,7 +1,7 @@
 var socketio = require('socket.io');
 var registration = require('./business/registration');
 var RegistrationRequest = require('./models/RegistrationRequest');
-// var gcm = require('./dao/gcmdao');
+var State = require('./models/State');
 var messages = require('./business/messages');
 
 var io;
@@ -33,27 +33,48 @@ function init_listeners() {
 
 		socket.on("REGISTER", function (request) {
 			var json = JSON.parse(request);
-			var client_id = json['REGISTRATION_ID'];
+			var state = new State(json);
+
+			console.log(state);
+
+			var client_id = state.TABLET_NAME;
 
 			add_user(client_id, socket, function() {
 				clients[client_id].emit('CONFIRMATION', 'true');
 				console.log("clients: " + Object.size(clients));
 
-				registration.save_registration(json, function(json) {
+				registration.save_registration(state, function(json) {
 
 				});	
+
+				send_message (state.STATION_NAME, "CONNECTION_UPDATE", JSON.stringify({
+					"CONNECTION_STATUS": true, 
+					"TABLET_NAME": state.TABLET_NAME
+				}));
 			});
+
+			
 		
 			
 		});
 
-		socket.on("UNREGISTER", function (client_id) {
-			console.log("unregistering " + client_id);
+		socket.on("UNREGISTER", function (request) {
+			var json = JSON.parse(request);
+			var state = new State(json);
 
-			remove_user(client_id, socket, function() {
+			console.log("unregistering " + state.TABLET_NAME);
+
+			send_message(state.STATION_NAME, "CONNECTION_UPDATE", JSON.stringify({
+					"CONNECTION_STATUS": false, 
+					"TABLET_NAME": state.TABLET_NAME
+				})
+			);
+
+			remove_user(state.TABLET_NAME, socket, function() {
 				console.log("Client List: " + Object.size(clients));
-				// registration.toggleRegister(client_id, false);
 			});
+
+			
 		});
 
 		socket.on("RECEIVE", function (request) {
@@ -117,6 +138,15 @@ function init_listeners() {
 			socket.emit("SERVER_DISCONNECT", sockets[socket]);
 		});
 	});
+}
+
+function send_message (to, operation, payload) {
+	console.log("Destination: " + to);
+	if (clients.hasOwnProperty(to)) {
+		clients[to].emit(operation, payload);
+	} else {
+		console.log(to + " is not a registered device.");
+	}
 }
 
 module.exports.send_message_to_device = function (location_id, payload) {
