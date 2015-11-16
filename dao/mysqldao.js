@@ -44,7 +44,7 @@ module.exports.init = function() {
 	connection.query( 'CREATE TABLE IF NOT EXISTS states (' +
 		DEVICE_ID + ' INT NOT NULL PRIMARY KEY, ' +
 		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.PHYSICIAN_ID + ' VARCHAR(50), ' +
+		State.PHYSICIAN_ID + ' VARCHAR(50) NOT NULL, ' +
 		State.NURSE_ID + ' VARCHAR(50), ' +
 		State.RESIDENT_ID + ' VARCHAR(50), ' + 
 		State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
@@ -80,16 +80,25 @@ module.exports.get_state_row_by_device_id = function (device_id, cb) {
 }
 
 module.exports.remove = function (key, cb) {
-	removeRowQuery = "DELETE FROM devices WHERE " + State.LOCATION_ID" = '" + key + "';";
+	removeRowQuery = "DELETE FROM devices WHERE " 
+			+ State.LOCATION_ID + " = '" + key + "';";
 
 	query_resposne_handler(removeRowQuery, cb);
 }
 
-module.exports.insert_devices = function (state, reg_id, cb) {
-	addDeviceQuery = "INSERT INTO devices (" + State.HOSPITAL_ID + ", " + State.GROUP_ID", " + State.LOCATION_ID + ", " + State.REGISTRATION_ID + ") "
-			+ "VALUES ('"+ state.HOSPITAL_ID +"', '"+ state.GROUP_ID + "', '" + state.LOCATION_ID +"', '"+ reg_id + "') "
-			+ "ON DUPLICATE KEY UPDATE " + 
-			REGISTRATION_ID +" = VALUES("  + REGISTRATION_ID + ");";
+module.exports.insert_devices = function (st, reg_id, cb) {
+	addDeviceQuery = "INSERT INTO devices (" 
+				+ State.HOSPITAL_ID + ", " 
+				+ State.GROUP_ID + ", " 
+				+ State.LOCATION_ID + ", " 
+				+ REGISTRATION_ID + ") "
+			+ "VALUES ('" 
+				+ st.HOSPITAL_ID + "', '" 
+				+ st.GROUP_ID + "', '" 
+				+ st.LOCATION_ID +"', '" 
+				+ reg_id + "') "
+			+ "ON DUPLICATE KEY UPDATE " 
+			+ REGISTRATION_ID + " = '"  + reg_id + "';";
 	
 	query_resposne_handler (addDeviceQuery, cb)
 }
@@ -124,9 +133,9 @@ module.exports.get_tablet_station_name = function (reg_id, cb) {
 
 }
 
-module.exports.insert_states = function( device_id, state, cb) {
-	var add_st_query = "INSERT INTO states (" 
-				+ State.DEVICE_ID + ", " 
+module.exports.insert_states = function( device_id, st, cb) {
+	var add_state_query = "INSERT INTO states (" 
+				+ DEVICE_ID + ", " 
 				+ State.LOCATION_ID + ", " 
 				+ State.PHYSICIAN_ID + ", " 
 				+ State.NURSE_ID + ", " 
@@ -136,33 +145,33 @@ module.exports.insert_states = function( device_id, state, cb) {
 				+ State.CONNECTION_INDICATOR_ID + ") "
 			+ "VALUES ( "
 				+ device_id + ", '"
-				+ state.LOCATION_ID + "', '" 
-				+ state.PHYSICIAN_ID + "', '"
-				+ state.NURSE_ID + "', '"
-				+ state.RESIDENT_ID + "', '"
-				+ state.CHIEF_COMPLAINT_ID + "', "
-				+ state.PAIN_RATING_ID + ", "
-				+ state.CONNECTION_INDICATOR_ID 
+				+ st.LOCATION_ID + "', '" 
+				+ st.PHYSICIAN_ID + "', '"
+				+ st.NURSE_ID + "', '"
+				+ st.RESIDENT_ID + "', '"
+				+ st.CHIEF_COMPLAINT_ID + "', "
+				+ st.PAIN_RATING_ID + ", "
+				+ st.CONNECTION_INDICATOR_ID 
 			+ ") "
 			+ "ON DUPLICATE KEY UPDATE "
-			+ State.LOCATION_ID + " = '" + state.LOCATION_ID + "', "
-			+ State.PHYSICIAN_ID + " = '" + state.PHYSICIAN_ID + "', "
-			+ State.NURSE_ID + " = '" + state.NURSE_ID + "', "
-			+ State.RESIDENT_ID + " = '" + state.RESIDENT_ID + "', "
-			+ State.CHIEF_COMPLAINT_ID + " = '" + state.CHIEF_COMPLAINT_ID + "', "
-			+ State.PAIN_RATING_ID + " = " + state.PAIN_RATING_ID + ", "
-			+ State.CONNECTION_INDICATOR_ID + " = " + state.CONNECTION_INDICATOR_ID
+			+ State.LOCATION_ID + " = '" + st.LOCATION_ID + "', "
+			+ State.PHYSICIAN_ID + " = '" + st.PHYSICIAN_ID + "', "
+			+ State.NURSE_ID + " = '" + st.NURSE_ID + "', "
+			+ State.RESIDENT_ID + " = '" + st.RESIDENT_ID + "', "
+			+ State.CHIEF_COMPLAINT_ID + " = '" + st.CHIEF_COMPLAINT_ID + "', "
+			+ State.PAIN_RATING_ID + " = " + st.PAIN_RATING_ID + ", "
+			+ State.CONNECTION_INDICATOR_ID + " = " + st.CONNECTION_INDICATOR_ID
 			+ ";";
 
 	query_resposne_handler(add_state_query, cb);
 } 
 
-module.exports.get_device_station = function(reg_id, cb) {
-	return;
-}
-
-module.exports.get_device_states_for_group = function(state, cb) {
-	var devices_query = "SELECT DEVICE_ID from devices where HOSPITAL_ID = '" + state.HOSPITAL_ID + "' AND GROUP_ID = '" + state.GROUP_ID + "' AND LOCATION_ID NOT LIKE '%STATION%'";
+module.exports.get_device_states_for_group = function(st, cb) {
+	var devices_query = "SELECT DEVICE_ID from devices where " 
+			+ State.HOSPITAL_ID + " = '" + st.HOSPITAL_ID + "' AND " 
+			+ State.GROUP_ID + " = '" + st.GROUP_ID + "' AND " 
+			+ State.LOCATION_ID + " NOT LIKE '%STATION%'";
+	
 	var get_device_states_query = "SELECT * FROM states left join devices on states.DEVICE_ID = devices.DEVICE_ID WHERE states.DEVICE_ID in (" + devices_query + ");";
 
 	query_resposne_handler(get_device_states_query, cb);
