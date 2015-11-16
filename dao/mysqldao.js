@@ -13,6 +13,9 @@
 var mysql = require('mysql');
 var State = require('../models/State');
 
+var DEVICE_ID = 'DEVICE_ID';
+var REGISTRATION_ID = 'REGISTRATION_ID';
+
 var connection = mysql.createConnection({
 	host 		: 'localhost',
 	user		: 'austinlg', 
@@ -30,23 +33,23 @@ module.exports.init = function() {
 	connection.connect();
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS devices (' +
-		'DEVICE_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ' +
-		'HOSPITAL_ID VARCHAR(50) NOT NULL, ' +
-		'GROUP_ID VARCHAR(50) NOT NULL, ' +
-		'LOCATION_ID VARCHAR(50) NOT NULL, ' +
-		'REGISTRATION_ID VARCHAR(250), ' +
- 		'UNIQUE (HOSPITAL_ID, GROUP_ID, LOCATION_ID) ' +
+		DEVICE_ID + ' INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ' +
+		State.HOSPITAL_ID + ' VARCHAR(50) NOT NULL, ' +
+		State.GROUP_ID + ' VARCHAR(50) NOT NULL, ' +
+		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
+		REGISTRATION_ID + ' VARCHAR(250), ' +
+ 		'UNIQUE (' + State.HOSPITAL_ID + ',' + State.GROUP_ID + ', ' + State.LOCATION_ID + ') ' +
 		');');
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS states (' +
-		'DEVICE_ID INT NOT NULL PRIMARY KEY, ' +
-		'LOCATION_ID VARCHAR(50) NOT NULL, ' +
-		'PHYSICIAN_ID VARCHAR(50), ' +
-		'NURSE_ID VARCHAR(50), ' +
-		'RESIDENT_ID VARCHAR(50), ' + 
-		'CHIEF_COMPLAINT_ID VARCHAR(100), ' +
-		'PAIN_RATING_ID INT, ' +
-		'CONNECTION_INDICATOR_ID BOOLEAN' +
+		DEVICE_ID + ' INT NOT NULL PRIMARY KEY, ' +
+		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
+		State.PHYSICIAN_ID + ' VARCHAR(50), ' +
+		State.NURSE_ID + ' VARCHAR(50), ' +
+		State.RESIDENT_ID + ' VARCHAR(50), ' + 
+		State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
+		State.PAIN_RATING_ID + ' INT, ' +
+		State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
 		');');
 }
 
@@ -54,12 +57,20 @@ module.exports.init = function() {
 		
 
 module.exports.get_reg_id = function (hospital_id, group_id, location_id, cb) {
-	sqlQuery = "SELECT REGISTRATION_ID FROM devices WHERE LOCATION_ID = '" + location_id + "' AND GROUP_ID = '" + group_id + "' AND HOSPITAL_ID = '"+ hospital_id +"';";
+	sqlQuery = "SELECT REGISTRATION_ID FROM devices WHERE " + 
+			State.LOCATION_ID + " = '" + location_id + "' AND " + 
+			State.GROUP_ID + " = '" + group_id + "' AND " + 
+			State.HOSPITAL_ID +" = '"+ hospital_id +"';";
+	
 	query_resposne_handler (sqlQuery, cb);
 }
 
-module.exports.get_device_row = function (state, cb) {
-	sqlQuery = "SELECT * FROM devices WHERE LOCATION_ID = '" + state.LOCATION_ID + "' AND GROUP_ID = '" + state.GROUP_ID + "' AND HOSPITAL_ID = '"+ state.HOSPITAL_ID +"';";
+module.exports.get_device_row = function (st, cb) {
+	sqlQuery = "SELECT * FROM devices WHERE "  + 
+			State.LOCATION_ID + " = '" + st.LOCATION_ID + "' AND " + 
+			State.GROUP_ID + " = '" + st.GROUP_ID + "' AND " + 
+			State.HOSPITAL_ID + " = '"+ st.HOSPITAL_ID +"';";
+	
 	query_resposne_handler (sqlQuery, cb);
 }
 
@@ -69,28 +80,34 @@ module.exports.get_state_row_by_device_id = function (device_id, cb) {
 }
 
 module.exports.remove = function (key, cb) {
-	removeRowQuery = "DELETE FROM devices WHERE LOCATION_ID = '" + key + "';";
+	removeRowQuery = "DELETE FROM devices WHERE " + State.LOCATION_ID" = '" + key + "';";
 
 	query_resposne_handler(removeRowQuery, cb);
 }
 
 module.exports.insert_devices = function (state, reg_id, cb) {
-	addDeviceQuery = "INSERT INTO devices (HOSPITAL_ID, GROUP_ID, LOCATION_ID, REGISTRATION_ID) "
+	addDeviceQuery = "INSERT INTO devices (" + State.HOSPITAL_ID + ", " + State.GROUP_ID", " + State.LOCATION_ID + ", " + State.REGISTRATION_ID + ") "
 			+ "VALUES ('"+ state.HOSPITAL_ID +"', '"+ state.GROUP_ID + "', '" + state.LOCATION_ID +"', '"+ reg_id + "') "
-			+ "ON DUPLICATE KEY UPDATE REGISTRATION_ID=VALUES(REGISTRATION_ID);";
+			+ "ON DUPLICATE KEY UPDATE " + 
+			REGISTRATION_ID +" = VALUES("  + REGISTRATION_ID + ");";
 	
 	query_resposne_handler (addDeviceQuery, cb)
 }
 
 module.exports.set_device_connection = function(reg_id, connection_status, cb) {
-	get_device_id_query = "SELECT DEVICE_ID FROM devices where REGISTRATION_ID = '" + reg_id + "'";
-	connection_query = "UPDATE states SET CONNECTION_INDICATOR_ID = " + connection_status + " WHERE DEVICE_ID in (" + get_device_id_query + ");";
+	get_device_id_query = "SELECT DEVICE_ID FROM devices where " + 
+			REGISTRATION_ID + " = '" + reg_id + "'";
+
+	connection_query = "UPDATE states SET " + 
+			State.CONNECTION_INDICATOR_ID + " = " + connection_status + " WHERE " + 
+			DEVICE_ID + " in (" + get_device_id_query + ");";
 
 	query_resposne_handler(connection_query, cb); 
 }
 
 module.exports.get_tablet_station_name = function (reg_id, cb) {
-	get_device_row = "SELECT * FROM devices where REGISTRATION_ID = '" + reg_id + "';";
+	get_device_row = "SELECT * FROM devices where " + 
+			REGISTRATION_ID + " = '" + reg_id + "';";
 
 	internal_query(get_device_row, function (err, result) {
 		if (err != undefined) {
@@ -108,7 +125,15 @@ module.exports.get_tablet_station_name = function (reg_id, cb) {
 }
 
 module.exports.insert_states = function( device_id, state, cb) {
-	var add_state_query = "INSERT INTO states (DEVICE_ID, LOCATION_ID, PHYSICIAN_ID, NURSE_ID, RESIDENT_ID, CHIEF_COMPLAINT_ID, PAIN_RATING_ID, CONNECTION_INDICATOR_ID) "
+	var add_st_query = "INSERT INTO states (" 
+				+ State.DEVICE_ID + ", " 
+				+ State.LOCATION_ID + ", " 
+				+ State.PHYSICIAN_ID + ", " 
+				+ State.NURSE_ID + ", " 
+				+ State.RESIDENT_ID + ", " 
+				+ State.CHIEF_COMPLAINT_ID + ", " 
+				+ State.PAIN_RATING_ID + ", " 
+				+ State.CONNECTION_INDICATOR_ID + ") "
 			+ "VALUES ( "
 				+ device_id + ", '"
 				+ state.LOCATION_ID + "', '" 
@@ -120,13 +145,13 @@ module.exports.insert_states = function( device_id, state, cb) {
 				+ state.CONNECTION_INDICATOR_ID 
 			+ ") "
 			+ "ON DUPLICATE KEY UPDATE "
-			+ "LOCATION_ID = '" + state.LOCATION_ID + "', "
-			+ "PHYSICIAN_ID = '" + state.PHYSICIAN_ID + "', "
-			+ "NURSE_ID = '" + state.NURSE_ID + "', "
-			+ "RESIDENT_ID = '" + state.RESIDENT_ID + "', "
-			+ "CHIEF_COMPLAINT_ID = '" + state.CHIEF_COMPLAINT_ID + "', "
-			+ "PAIN_RATING_ID = " + state.PAIN_RATING_ID + ", "
-			+ "CONNECTION_INDICATOR_ID = " + state.CONNECTION_INDICATOR_ID
+			+ State.LOCATION_ID + " = '" + state.LOCATION_ID + "', "
+			+ State.PHYSICIAN_ID + " = '" + state.PHYSICIAN_ID + "', "
+			+ State.NURSE_ID + " = '" + state.NURSE_ID + "', "
+			+ State.RESIDENT_ID + " = '" + state.RESIDENT_ID + "', "
+			+ State.CHIEF_COMPLAINT_ID + " = '" + state.CHIEF_COMPLAINT_ID + "', "
+			+ State.PAIN_RATING_ID + " = " + state.PAIN_RATING_ID + ", "
+			+ State.CONNECTION_INDICATOR_ID + " = " + state.CONNECTION_INDICATOR_ID
 			+ ";";
 
 	query_resposne_handler(add_state_query, cb);
