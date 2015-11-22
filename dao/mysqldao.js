@@ -48,6 +48,10 @@ module.exports.init = function() {
 		State.NURSE_ID + ' VARCHAR(50), ' +
 		State.RESIDENT_ID + ' VARCHAR(50), ' + 
 		State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
+		State.SHOWN_TESTS_ID + ' VARCHAR(1000), ' +
+		State.SHOWN_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+		State.ALL_TESTS_ID + ' VARCHAR(1000), ' +
+		State.ALL_MEDICATIONS_ID + ' VARCHAR(1000), ' +
 		State.PAIN_RATING_ID + ' INT, ' +
 		State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
 		');');
@@ -133,7 +137,26 @@ module.exports.get_tablet_station_name = function (reg_id, cb) {
 
 }
 
+function start_replace(jsonarray) {
+	for (var index = 0; index < jsonarray.length; index++) {
+		jsonarray[index] = jsonarray[index].replace("'", "\\'");
+		console.log(jsonarray[index]);
+	}
+
+	return jsonarray;
+}
+
 module.exports.insert_states = function( device_id, st, cb) {
+
+	var replace_string = "[" + String.fromCharCode(8217) + String.fromCharCode(8216) + String.fromCharCode(39) + "]";
+	console.log();
+ 
+	console.log("start_replace");
+	var all_tests = JSON.stringify(st.ALL_TESTS_ID).replace(new RegExp(replace_string, "g"), "\\'");
+	var all_meds = JSON.stringify(st.ALL_MEDICATIONS_ID).replace("'", "\\'");
+	console.log("INSERT");
+	console.log(all_tests);
+	
 	var add_state_query = "INSERT INTO states (" 
 				+ DEVICE_ID + ", " 
 				+ State.LOCATION_ID + ", " 
@@ -142,6 +165,10 @@ module.exports.insert_states = function( device_id, st, cb) {
 				+ State.RESIDENT_ID + ", " 
 				+ State.CHIEF_COMPLAINT_ID + ", " 
 				+ State.PAIN_RATING_ID + ", " 
+				+ State.SHOWN_TESTS_ID + ", "
+				+ State.SHOWN_MEDICATIONS_ID + ", "
+				+ State.ALL_TESTS_ID + ", "
+				+ State.ALL_MEDICATIONS_ID + ", "
 				+ State.CONNECTION_INDICATOR_ID + ") "
 			+ "VALUES ( "
 				+ device_id + ", '"
@@ -150,7 +177,11 @@ module.exports.insert_states = function( device_id, st, cb) {
 				+ st.NURSE_ID + "', '"
 				+ st.RESIDENT_ID + "', '"
 				+ st.CHIEF_COMPLAINT_ID + "', "
-				+ st.PAIN_RATING_ID + ", "
+				+ st.PAIN_RATING_ID + ", '"
+				+ st.SHOWN_TESTS_ID + "', '"
+				+ st.SHOWN_MEDICATIONS_ID + "', '"
+				+ all_tests + "', '"
+				+ all_meds + "', "
 				+ st.CONNECTION_INDICATOR_ID 
 			+ ") "
 			+ "ON DUPLICATE KEY UPDATE "
@@ -160,6 +191,10 @@ module.exports.insert_states = function( device_id, st, cb) {
 			+ State.RESIDENT_ID + " = '" + st.RESIDENT_ID + "', "
 			+ State.CHIEF_COMPLAINT_ID + " = '" + st.CHIEF_COMPLAINT_ID + "', "
 			+ State.PAIN_RATING_ID + " = " + st.PAIN_RATING_ID + ", "
+			+ State.SHOWN_TESTS_ID + " = '" + JSON.stringify(st.SHOWN_TESTS_ID) + "', "
+			+ State.SHOWN_MEDICATIONS_ID + " = '" + JSON.stringify(st.SHOWN_MEDICATIONS_ID) + "', "
+			+ State.ALL_TESTS_ID + " = '" + all_tests + "', "
+			+ State.ALL_MEDICATIONS_ID + " = '" + all_meds + "', "
 			+ State.CONNECTION_INDICATOR_ID + " = " + st.CONNECTION_INDICATOR_ID
 			+ ";";
 
