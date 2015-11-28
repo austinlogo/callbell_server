@@ -178,8 +178,8 @@ module.exports.insert_states = function( device_id, st, cb) {
 				+ st.RESIDENT_ID + "', '"
 				+ st.CHIEF_COMPLAINT_ID + "', "
 				+ st.PAIN_RATING_ID + ", '"
-				+ st.SHOWN_TESTS_ID + "', '"
-				+ st.SHOWN_MEDICATIONS_ID + "', '"
+				+ JSON.stringify(st.SHOWN_TESTS_ID) + "', '"
+				+ JSON.stringify(st.SHOWN_MEDICATIONS_ID) + "', '"
 				+ all_tests + "', '"
 				+ all_meds + "', "
 				+ st.CONNECTION_INDICATOR_ID 
