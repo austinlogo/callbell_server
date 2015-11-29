@@ -67,27 +67,29 @@ describe('messages', function() {
     describe('route_message', function() {
         it('sends_message_succesfull', function() {
             
+            stubbedGcm.send_message.reset();
+            
             messages.route_message(testData.message_json, function(err, result) {
-//                console.log("result: " + result);
-                
-                assert.equal(true, false);
-                console.log("done WITH ASSERTING FALSE");
-                assert(stubbedDao.get_reg_id.called);
-                assert(stubbedGcm.send_message.called);
-                
+                console.log("done");
+                assert(stubbedDao.get_reg_id.calledOnce);
+                console.log("done");
+                assert(stubbedGcm.send_message.calledOnce);
+                console.log("done");
+                assert(false);
                 console.log("done");
             });
         });
         
         it('sends_message_unsuccesfull', function() {
            
+            stubbedGcm.send_message.reset();
             stubbedGcm.send_message.yields("AUSTIN", "SECOND");
             
             messages.route_message(testData.message_json, function(err, result) {
                 console.log("result: " + result);
                 
                 assert(stubbedDao.get_reg_id.called);
-                assert(stubbedGcm.send_message.called);
+                assert(stubbedGcm.send_message.calledOnce);
             });           
         });
     });
@@ -95,8 +97,10 @@ describe('messages', function() {
     describe('update_state', function() {
         
         it('update_successful', function() {
+            stubbedGcm.send_message.reset();
+            
             messages.update_state(testData.state_body_json, function(resp) {
-                
+                assert(stubbedGcm.send_message.calledOnce);
             });
         });
     });

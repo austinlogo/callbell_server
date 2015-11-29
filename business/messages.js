@@ -9,7 +9,7 @@ exports.route_message = function(json, master_callback) {
 
 	send_gcm_message(message, function(gcm_result) {
         console.log("GCM: " + gcm_result);
-		master_callback(null, gcm_result);
+		return master_callback (null, gcm_result);
 	});
 }
 

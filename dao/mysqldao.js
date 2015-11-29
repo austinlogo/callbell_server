@@ -138,8 +138,8 @@ module.exports.get_tablet_station_name = function (reg_id, cb) {
 	internal_query(get_device_row, function (err, result) {
 		if (err != undefined) {
 			console.error("send_connection_status_to_station error");
-			console.log(err);
-            return cb(null, null);
+			console.error(err);
+            return cb(error, null);
 		} else if (result == undefined || result[0] == undefined) {
             console.log("no results returned");
             return cb(null, null);

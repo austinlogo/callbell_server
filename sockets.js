@@ -90,7 +90,7 @@ function init_listeners() {
 			var jsonRequest = JSON.parse(request);
 
 			messages.update_state(jsonRequest, function(resp) {});
-			messages.route_message(jsonRequest, function(resp) {});
+//			messages.route_message(jsonRequest, function(resp) {});
 
 
 		});
