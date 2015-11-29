@@ -8,6 +8,7 @@ exports.route_message = function(json, master_callback) {
 	var message = new Message(json);
 
 	send_gcm_message(message, function(gcm_result) {
+        console.log("GCM: " + gcm_result);
 		master_callback(null, gcm_result);
 	});
 }
@@ -76,14 +77,15 @@ exports.get_device_states = function (body, master_callback) {
 			'stateList': result
 		}
 
-		master_callback(resp_json);
+		 return master_callback(resp_json);
 	});
 }
 
 
-function send_gcm_message (message, cb) {
+function send_gcm_message (message, master_cb) {
 	async.waterfall([
-		//get destination registration_id
+		
+        //get destination registration_id
 		function(cb) {
 			mysqlDao.get_reg_id(message.state.HOSPITAL_ID, message.state.GROUP_ID, message.to_id, function (err, result) {
 				console.log(result);
@@ -98,7 +100,8 @@ function send_gcm_message (message, cb) {
 				cb(err, result[0]['REGISTRATION_ID']);
 			});
 		},
-		//send message
+		
+        //send message
 		function(loc_id, cb) {
 			if (loc_id == undefined) {
 
@@ -108,21 +111,26 @@ function send_gcm_message (message, cb) {
 			}
 
 			console.log("Sending Message from " + message.state.LOCATION_ID);
-			console.log("CATEGORY: " + message.category);
-			gcm.send_message(loc_id, message.state, message.payload, message.category, message.state.LOCATION_ID, function (resp) {
-				console.log(resp);
-				cb (null, resp);
-			});
+			gcm.send_message(
+                loc_id, 
+                message.state, 
+                message.payload, 
+                message.category, 
+                message.state.LOCATION_ID, 
+                function (err, resp) {
+                    console.log("hello darling");
+                    console.log(resp);
+                    cb (err, resp);
+                });
 		}
 	], function(err, result) {
 		if (err != undefined) {
 			console.log("Error in routing message: ");
 			console.log(err);
-			cb(err);
+			master_cb(err);
 			
 		}
-
-		cb(result);
+		master_cb(result);
 	});
 }
 

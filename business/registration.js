@@ -12,13 +12,11 @@ exports.save_registration = function (state, master_callback) {
 			mysqlDao.insert_devices(state, 
 					state.TABLET_NAME, 
 					function(err, result) {
-
+                
 				if (err != undefined) {
-					console.log("error saving registration: " + error);
+					console.log("error saving registration: " + err);
 				}
-
-				
-
+                
 				 cb (err, result);
 			});
 		},
