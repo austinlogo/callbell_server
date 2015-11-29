@@ -1,33 +1,22 @@
-/*
-	Database Interface : MYSQL
-	For forms sake I'm going to try and establish an interface-like structure here. this is an implementation of a 
-
-
-	- init ()		: Initializes the database if necessary
-	- get (key)		: Gets a row based on the primary key
-	- remove (key)	: Removes a row based on the inputed primary key
-	- insert (key)	: Insert a row based on the inputted primary key
-	- update (key)	: updates a row based on the inputed primary key
-*/
 
 var mysql = require('mysql');
 var State = require('../models/State');
+var env = require('../config/env');
 
 var DEVICE_ID = 'DEVICE_ID';
 var REGISTRATION_ID = 'REGISTRATION_ID';
 
-var connection = mysql.createConnection({
-	host 		: 'localhost',
-	user		: 'austinlg', 
-	password	: 'sniper', 
-	database 	: 'call_bell'
-});
+var connection = mysql.createConnection(env.mysql_db_settings);
 
 
 module.exports.reg_id_key = "REGISTRATION_ID";
 module.exports.hospital_id_key = "HOSPITAL_ID";
 module.exports.group_id = "GROUP_ID";
 module.exports.location_id_key = "LOCATION_ID";
+
+module.exports.set_db_connection = function(conn_settings) {
+    connection = mysql.createConnection(conn_settings);
+}
 
 module.exports.init = function() {
 	connection.connect();
@@ -42,6 +31,30 @@ module.exports.init = function() {
 		');');
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS states (' +
+		DEVICE_ID + ' INT NOT NULL PRIMARY KEY, ' +
+		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
+		State.PHYSICIAN_ID + ' VARCHAR(50) NOT NULL, ' +
+		State.NURSE_ID + ' VARCHAR(50), ' +
+		State.RESIDENT_ID + ' VARCHAR(50), ' + 
+		State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
+		State.SHOWN_TESTS_ID + ' VARCHAR(1000), ' +
+		State.SHOWN_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+		State.ALL_TESTS_ID + ' VARCHAR(1000), ' +
+		State.ALL_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+		State.PAIN_RATING_ID + ' INT, ' +
+		State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
+		');');
+    
+    console.log('CREATE TABLE IF NOT EXISTS devices (' +
+		DEVICE_ID + ' INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ' +
+		State.HOSPITAL_ID + ' VARCHAR(50) NOT NULL, ' +
+		State.GROUP_ID + ' VARCHAR(50) NOT NULL, ' +
+		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
+		REGISTRATION_ID + ' VARCHAR(250), ' +
+ 		'UNIQUE (' + State.HOSPITAL_ID + ',' + State.GROUP_ID + ', ' + State.LOCATION_ID + ') ' +
+		');');
+    
+    console.log('CREATE TABLE IF NOT EXISTS states (' +
 		DEVICE_ID + ' INT NOT NULL PRIMARY KEY, ' +
 		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
 		State.PHYSICIAN_ID + ' VARCHAR(50) NOT NULL, ' +
@@ -124,26 +137,19 @@ module.exports.get_tablet_station_name = function (reg_id, cb) {
 
 	internal_query(get_device_row, function (err, result) {
 		if (err != undefined) {
-			console.log("send_connection_status_to_station error");
+			console.error("send_connection_status_to_station error");
 			console.log(err);
-		}
+            return cb(null, null);
+		} else if (result == undefined || result[0] == undefined) {
+            console.log("no results returned");
+            return cb(null, null);
+        }
 
 		var state = new State(result[0]);
 
-		cb(state.STATION_NAME, state);
-
-
+		return cb(state.STATION_NAME, state);
 	});
 
-}
-
-function start_replace(jsonarray) {
-	for (var index = 0; index < jsonarray.length; index++) {
-		jsonarray[index] = jsonarray[index].replace("'", "\\'");
-		console.log(jsonarray[index]);
-	}
-
-	return jsonarray;
 }
 
 module.exports.insert_states = function( device_id, st, cb) {
@@ -233,6 +239,7 @@ function internal_query(query_string, cb) {
 			console.log("Database query error: " + err);
 		} 
 
+        console.log("check")
 		cb (err, result);
 	});
 }
