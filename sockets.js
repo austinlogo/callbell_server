@@ -10,6 +10,11 @@ var socket;
 var clients;
 var sockets;
 
+
+var SERVER_DISCONNECT = "SERVER_DISCONNECT";
+var CONNECTION_UPDATE = "CONNECTION_UPDATE";
+var GET_DEVICE_STATES = "GET_DEVICE_STATES";
+
 Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
@@ -35,7 +40,8 @@ function init_listeners() {
         socket.on("REGISTER", function (request) {
             var json = JSON.parse(request);
             var state = new State(json);
-
+            
+            console.log("REGISTER");
             console.log(state);
 
             var client_id = state.TABLET_NAME;
@@ -102,22 +108,25 @@ function init_listeners() {
 
         });
 
-        socket.on("GET_DEVICE_STATES", function (request) {
+        socket.on(GET_DEVICE_STATES, function (request) {
+            console.log("GET_DEVICE_STATES");
             var body = JSON.parse(request);
+            var state = new State(body[State.id_key]);
             console.log(body);
 
-            messages.update_state(body, function(resp) {
-
+            messages.get_device_states(body, function(resp) {
+                send_message_back(socket, GET_DEVICE_STATES, resp);
             });
         });
-
-        socket.on("UPDATE_STATE", function  (request) {
-            var body = JSON.parse(request);
-
-            messages.get_device_states(body, clients, function(resp) {
-
-            });
-        });
+        
+//
+//        socket.on("UPDATE_STATE", function  (request) {
+//            var body = JSON.parse(request);
+//
+//            messages.get_device_states(body, clients, function(resp) {
+//
+//            });
+//        });
         
         socket.on("ping", function (to) {
             var isAdded = clients.hasOwnProperty(to);
@@ -140,9 +149,18 @@ function init_listeners() {
 
         socket.on("disconnect", function () {
             console.log("on disconnect of " + sockets[socket]);
-            socket.emit("SERVER_DISCONNECT", sockets[socket]);
+            remove_user(sockets[socket], socket, function() {});
+            socket.emit(SERVER_DISCONNECT, sockets[socket]);
         });
     });
+}
+
+function send_message_back(socket, operation, payload) {
+    console.log("Sending Message Back");
+    
+    if (socket != undefined) {
+    socket.emit(operation, payload);
+    }
 }
 
 function send_message (to, operation, payload) {
@@ -170,16 +188,22 @@ function add_user (client, socket, cb) {
     console.log("Added User: " + client);
     console.log(Object.keys(clients));
 
+    registration.toggleRegister(client, true, function() {});
     return cb();
 }
 
 function remove_user (client, socket, cb) {
-    delete clients[client];
-    delete sockets[socket];
-
-    console.log("Removed user: " + client);
-    console.log(Object.keys(clients));
-
+    if (socket != undefined && sockets[socket] != undefined) {
+        delete sockets[socket];
+    }
+    
+    if (client != undefined) {
+        console.log("Removed user: " + client);
+        delete clients[client];
+    }
+    
+    registration.toggleRegister(client, false, function() {});
+    
     cb();
 }
 
