@@ -66,6 +66,31 @@ exports.update_state = function (body, master_callback) {
 	});
 }
 
+exports.retrieve_state = function(json) {
+	var state = new State(json[State.id_key]);
+
+	console.log("MESSAGES RETRIEVE STATE");
+	console.log(state);
+	var to = state.LOCATION_ID
+
+	mysqlDao.get_device_row(state, function(err, result) {		
+		var message = new Message();
+
+		if (result.length == 0) {
+			state = new State({});
+		} else {
+			state = new State(result[0]);
+		}
+
+		message.state = state;
+		message.to_id = to;
+		message.category = "RETRIEVE_STATE";
+		message.payload = {};
+
+		send_gcm_message(message, function(result) {});
+	});
+}
+
 exports.get_device_states = function (body, master_callback) {
 	var state = new State(body[State.id_key]);
 	console.log("STATE: ");

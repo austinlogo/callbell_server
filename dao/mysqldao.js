@@ -42,6 +42,7 @@ module.exports.init = function() {
 		State.ALL_TESTS_ID + ' VARCHAR(1000), ' +
 		State.ALL_MEDICATIONS_ID + ' VARCHAR(1000), ' +
 		State.PAIN_RATING_ID + ' INT, ' +
+		State.ACCEPTABLE_PAIN_ID + ' INT, ' +
 		State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
 		');');
     
@@ -171,6 +172,7 @@ module.exports.insert_states = function( device_id, st, cb) {
 				+ State.RESIDENT_ID + ", " 
 				+ State.CHIEF_COMPLAINT_ID + ", " 
 				+ State.PAIN_RATING_ID + ", " 
+				+ State.ACCEPTABLE_PAIN_ID + ", "
 				+ State.SHOWN_TESTS_ID + ", "
 				+ State.SHOWN_MEDICATIONS_ID + ", "
 				+ State.ALL_TESTS_ID + ", "
@@ -183,7 +185,8 @@ module.exports.insert_states = function( device_id, st, cb) {
 				+ st.NURSE_ID + "', '"
 				+ st.RESIDENT_ID + "', '"
 				+ st.CHIEF_COMPLAINT_ID + "', "
-				+ st.PAIN_RATING_ID + ", '"
+				+ st.PAIN_RATING_ID + ", "
+				+ st.ACCEPTABLE_PAIN_ID + ", '"
 				+ JSON.stringify(st.SHOWN_TESTS_ID) + "', '"
 				+ JSON.stringify(st.SHOWN_MEDICATIONS_ID) + "', '"
 				+ all_tests + "', '"
@@ -197,6 +200,7 @@ module.exports.insert_states = function( device_id, st, cb) {
 			+ State.RESIDENT_ID + " = '" + st.RESIDENT_ID + "', "
 			+ State.CHIEF_COMPLAINT_ID + " = '" + st.CHIEF_COMPLAINT_ID + "', "
 			+ State.PAIN_RATING_ID + " = " + st.PAIN_RATING_ID + ", "
+			+ State.ACCEPTABLE_PAIN_ID + " = " + st.ACCEPTABLE_PAIN_ID + ", "
 			+ State.SHOWN_TESTS_ID + " = '" + JSON.stringify(st.SHOWN_TESTS_ID) + "', "
 			+ State.SHOWN_MEDICATIONS_ID + " = '" + JSON.stringify(st.SHOWN_MEDICATIONS_ID) + "', "
 			+ State.ALL_TESTS_ID + " = '" + all_tests + "', "

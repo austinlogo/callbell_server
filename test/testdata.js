@@ -6,6 +6,7 @@ exports.state_one = {
     "RESIDENT_ID": "",
     "LOCATION_ID": "3",
     "GROUP_ID": "ER",
+    "ACCEPTABLE_PAIN_RATING_ID": 3,
     "PAIN_RATING_ID" : 0,
     "PHYSICIAN_ID": "House",
     "CHIEF_COMPLAINT_ID": "Slurred Speak",
