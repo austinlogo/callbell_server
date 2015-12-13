@@ -14,8 +14,10 @@ exports.state_one = {
     "CONNECTION_INDICATOR_ID": 1,
     "TABLE_NAME_ID": "TEST_ER_3",
     "STATION_TABLET_NAME_ID": "TEST_ER_STATION",
-    "SHOWN_TESTS_ID": "[0,1,2]",
-    "SHOWN_MEDICATIONS_ID": "[0]",
+    "PENDING_TESTS_ID": "[0,1,2]",
+    "PENDING_MEDICATIONS_ID": "[0]",
+    "DONE_TESTS_ID": "[3]",
+    "DONE_MEDICATIONS_ID": "[5]",
     "ALL_TESTS_ID": "[]",
     "ALL_MEDICATIONS_ID": "[]",
 }

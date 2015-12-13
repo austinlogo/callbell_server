@@ -37,36 +37,14 @@ module.exports.init = function() {
 		State.NURSE_ID + ' VARCHAR(50), ' +
 		State.RESIDENT_ID + ' VARCHAR(50), ' + 
 		State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
-		State.SHOWN_TESTS_ID + ' VARCHAR(1000), ' +
-		State.SHOWN_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+		State.PENDING_TESTS_ID + ' VARCHAR(1000), ' +
+		State.PENDING_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+        State.DONE_TESTS_ID + ' VARCHAR(1000), ' +
+		State.DONE_MEDICATIONS_ID + ' VARCHAR(1000), ' +
 		State.ALL_TESTS_ID + ' VARCHAR(1000), ' +
 		State.ALL_MEDICATIONS_ID + ' VARCHAR(1000), ' +
 		State.PAIN_RATING_ID + ' INT, ' +
 		State.ACCEPTABLE_PAIN_ID + ' INT, ' +
-		State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
-		');');
-    
-    console.log('CREATE TABLE IF NOT EXISTS devices (' +
-		DEVICE_ID + ' INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ' +
-		State.HOSPITAL_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.GROUP_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
-		REGISTRATION_ID + ' VARCHAR(250), ' +
- 		'UNIQUE (' + State.HOSPITAL_ID + ',' + State.GROUP_ID + ', ' + State.LOCATION_ID + ') ' +
-		');');
-    
-    console.log('CREATE TABLE IF NOT EXISTS states (' +
-		DEVICE_ID + ' INT NOT NULL PRIMARY KEY, ' +
-		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.PHYSICIAN_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.NURSE_ID + ' VARCHAR(50), ' +
-		State.RESIDENT_ID + ' VARCHAR(50), ' + 
-		State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
-		State.SHOWN_TESTS_ID + ' VARCHAR(1000), ' +
-		State.SHOWN_MEDICATIONS_ID + ' VARCHAR(1000), ' +
-		State.ALL_TESTS_ID + ' VARCHAR(1000), ' +
-		State.ALL_MEDICATIONS_ID + ' VARCHAR(1000), ' +
-		State.PAIN_RATING_ID + ' INT, ' +
 		State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
 		');');
 }
@@ -173,8 +151,10 @@ module.exports.insert_states = function( device_id, st, cb) {
 				+ State.CHIEF_COMPLAINT_ID + ", " 
 				+ State.PAIN_RATING_ID + ", " 
 				+ State.ACCEPTABLE_PAIN_ID + ", "
-				+ State.SHOWN_TESTS_ID + ", "
-				+ State.SHOWN_MEDICATIONS_ID + ", "
+				+ State.PENDING_TESTS_ID + ", "
+				+ State.PENDING_MEDICATIONS_ID + ", "
+                + State.DONE_TESTS_ID + ", "
+				+ State.DONE_MEDICATIONS_ID + ", "
 				+ State.ALL_TESTS_ID + ", "
 				+ State.ALL_MEDICATIONS_ID + ", "
 				+ State.CONNECTION_INDICATOR_ID + ") "
@@ -187,8 +167,10 @@ module.exports.insert_states = function( device_id, st, cb) {
 				+ st.CHIEF_COMPLAINT_ID + "', "
 				+ st.PAIN_RATING_ID + ", "
 				+ st.ACCEPTABLE_PAIN_ID + ", '"
-				+ JSON.stringify(st.SHOWN_TESTS_ID) + "', '"
-				+ JSON.stringify(st.SHOWN_MEDICATIONS_ID) + "', '"
+				+ JSON.stringify(st.PENDING_TESTS_ID) + "', '"
+				+ JSON.stringify(st.PENDING_MEDICATIONS_ID) + "', '"
+                + JSON.stringify(st.DONE_TESTS_ID) + "', '"
+				+ JSON.stringify(st.DONE_MEDICATIONS_ID) + "', '"
 				+ all_tests + "', '"
 				+ all_meds + "', "
 				+ st.CONNECTION_INDICATOR_ID 
@@ -201,8 +183,10 @@ module.exports.insert_states = function( device_id, st, cb) {
 			+ State.CHIEF_COMPLAINT_ID + " = '" + st.CHIEF_COMPLAINT_ID + "', "
 			+ State.PAIN_RATING_ID + " = " + st.PAIN_RATING_ID + ", "
 			+ State.ACCEPTABLE_PAIN_ID + " = " + st.ACCEPTABLE_PAIN_ID + ", "
-			+ State.SHOWN_TESTS_ID + " = '" + JSON.stringify(st.SHOWN_TESTS_ID) + "', "
-			+ State.SHOWN_MEDICATIONS_ID + " = '" + JSON.stringify(st.SHOWN_MEDICATIONS_ID) + "', "
+			+ State.PENDING_TESTS_ID + " = '" + JSON.stringify(st.PENDING_TESTS_ID) + "', "
+			+ State.PENDING_MEDICATIONS_ID + " = '" + JSON.stringify(st.PENDING_MEDICATIONS_ID) + "', "
+            + State.DONE_TESTS_ID + " = '" + JSON.stringify(st.DONE_TESTS_ID) + "', "
+			+ State.DONE_MEDICATIONS_ID + " = '" + JSON.stringify(st.DONE_MEDICATIONS_ID) + "', "
 			+ State.ALL_TESTS_ID + " = '" + all_tests + "', "
 			+ State.ALL_MEDICATIONS_ID + " = '" + all_meds + "', "
 			+ State.CONNECTION_INDICATOR_ID + " = " + st.CONNECTION_INDICATOR_ID
