@@ -6,6 +6,10 @@ var State = require('../models/State');
 
 exports.route_message = function(json, master_callback) {
 	var message = new Message(json);
+    
+    if (message.category == Message.CATEGORY_CALL_BELL) {
+        mysqlDao.record_call_bell(message);
+    }
 
 	send_gcm_message(message, function(gcm_result) {
         console.log("GCM: " + gcm_result);

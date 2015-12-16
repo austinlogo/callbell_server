@@ -67,4 +67,4 @@ State.DONE_MEDICATIONS_ID = DONE_MEDICATIONS_ID;
 State.ALL_TESTS_ID = ALL_TESTS_ID;
 State.ALL_MEDICATIONS_ID = ALL_MEDICATIONS_ID;
 
-module.exports = State
+module.exports = State;

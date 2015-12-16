@@ -1,6 +1,7 @@
 
 var mysql = require('mysql');
 var State = require('../models/State');
+var Message = require('../models/Message');
 var env = require('../config/env');
 
 var DEVICE_ID = 'DEVICE_ID';
@@ -22,35 +23,62 @@ module.exports.init = function() {
 	connection.connect();
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS devices (' +
-		DEVICE_ID + ' INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ' +
-		State.HOSPITAL_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.GROUP_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
-		REGISTRATION_ID + ' VARCHAR(250), ' +
- 		'UNIQUE (' + State.HOSPITAL_ID + ',' + State.GROUP_ID + ', ' + State.LOCATION_ID + ') ' +
-		');');
+            DEVICE_ID + ' INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ' +
+            State.HOSPITAL_ID + ' VARCHAR(50) NOT NULL, ' +
+            State.GROUP_ID + ' VARCHAR(50) NOT NULL, ' +
+            State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
+            REGISTRATION_ID + ' VARCHAR(250), ' +
+            'UNIQUE (' + State.HOSPITAL_ID + ',' + State.GROUP_ID + ', ' + State.LOCATION_ID + ') ' +
+            ');');
 
 	connection.query( 'CREATE TABLE IF NOT EXISTS states (' +
-		DEVICE_ID + ' INT NOT NULL PRIMARY KEY, ' +
-		State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.PHYSICIAN_ID + ' VARCHAR(50) NOT NULL, ' +
-		State.NURSE_ID + ' VARCHAR(50), ' +
-		State.RESIDENT_ID + ' VARCHAR(50), ' + 
-		State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
-		State.PENDING_TESTS_ID + ' VARCHAR(1000), ' +
-		State.PENDING_MEDICATIONS_ID + ' VARCHAR(1000), ' +
-        State.DONE_TESTS_ID + ' VARCHAR(1000), ' +
-		State.DONE_MEDICATIONS_ID + ' VARCHAR(1000), ' +
-		State.ALL_TESTS_ID + ' VARCHAR(1000), ' +
-		State.ALL_MEDICATIONS_ID + ' VARCHAR(1000), ' +
-		State.PAIN_RATING_ID + ' INT, ' +
-		State.ACCEPTABLE_PAIN_ID + ' INT, ' +
-		State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
-		');');
+            DEVICE_ID + ' INT NOT NULL PRIMARY KEY, ' +
+            State.LOCATION_ID + ' VARCHAR(50) NOT NULL, ' +
+            State.PHYSICIAN_ID + ' VARCHAR(50) NOT NULL, ' +
+            State.NURSE_ID + ' VARCHAR(50), ' +
+            State.RESIDENT_ID + ' VARCHAR(50), ' + 
+            State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
+            State.PENDING_TESTS_ID + ' VARCHAR(1000), ' +
+            State.PENDING_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+            State.DONE_TESTS_ID + ' VARCHAR(1000), ' +
+            State.DONE_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+            State.ALL_TESTS_ID + ' VARCHAR(1000), ' +
+            State.ALL_MEDICATIONS_ID + ' VARCHAR(1000), ' +
+            State.PAIN_RATING_ID + ' INT, ' +
+            State.ACCEPTABLE_PAIN_ID + ' INT, ' +
+            State.CONNECTION_INDICATOR_ID + ' BOOLEAN' +
+            ');');
+    
+    connection.query( 'CREATE TABLE IF NOT EXISTS CALL_HISTORY (' 
+            + 'CALL_HISTORY_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT, '
+            + State.HOSPITAL_ID + ' VARCHAR(50) NOT NULL, '
+            + State.GROUP_ID + ' VARCHAR(50) NOT NULL, ' 
+            + State.LOCATION_ID + ' VARCHAR(50) NOT NULL, '
+            + Message.CALL_BELL_REASON + ' VARCHAR(30) NOT NULL, '
+            + 'TIMESTAMP DATETIME NOT NULL '
+            + ');');
+    
+    
+    
 }
 
-
-		
+module.exports.record_call_bell = function(message) {
+    sqlQuery = "INSERT INTO CALL_HISTORY (" 
+                + State.HOSPITAL_ID + ", "
+                + State.GROUP_ID + ", "
+                + State.LOCATION_ID + ", "
+                + Message.CALL_BELL_REASON + ", "
+                + "TIMESTAMP) "
+            + "VALUES ('"
+                + message.state.HOSPITAL_ID + "', '"
+                + message.state.GROUP_ID + "', '"
+                + message.state.LOCATION_ID + "', '"
+                + message.payload + "', "
+                + "NOW()"
+            + ");"
+    
+    query_resposne_handler(sqlQuery, function(err, result) {});
+}
 
 module.exports.get_reg_id = function (hospital_id, group_id, location_id, cb) {
 	sqlQuery = "SELECT REGISTRATION_ID FROM devices WHERE " + 
