@@ -14,6 +14,7 @@ var sockets;
 var SERVER_DISCONNECT = "SERVER_DISCONNECT";
 var CONNECTION_UPDATE = "CONNECTION_UPDATE";
 var GET_DEVICE_STATES = "GET_DEVICE_STATES";
+var UPLOAD_EDUCATION_METRICS = "UPLOAD_EDUCATION_METRICS";
 
 Object.size = function(obj) {
     var size = 0, key;
@@ -117,6 +118,10 @@ function init_listeners() {
             messages.get_device_states(body, function(resp) {
                 send_message_back(socket, GET_DEVICE_STATES, resp);
             });
+        });
+        
+        socket.on(UPLOAD_EDUCATION_METRICS, function(request) {
+             
         });
         
 //
