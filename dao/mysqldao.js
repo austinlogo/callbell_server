@@ -1,7 +1,7 @@
-
 var mysql = require('mysql');
 var State = require('../models/State');
 var Message = require('../models/Message');
+var EducationMetric = require('../models/EducationMetric');
 var env = require('../config/env');
 
 var DEVICE_ID = 'DEVICE_ID';
@@ -58,8 +58,15 @@ module.exports.init = function() {
             + 'TIMESTAMP DATETIME NOT NULL '
             + ');');
     
-    
-    
+    connection.query( 'CREATE TABLE IF NOT EXISTS EDUCATION_METRICS ('
+            + EducationMetric.id + ' INT NOT NULL PRIMARY KEY AUTO_INCREMENT, '
+            + State.HOSPITAL_ID + ' VARCHAR(50) NOT NULL, '
+            + State.GROUP_ID + ' VARCHAR(50) NOT NULL, ' 
+            + State.LOCATION_ID + ' VARCHAR(50) NOT NULL, '
+            + EducationMetric.EDUCATION_METRIC_TITLE + ' VARCHAR(50) NOT NULL, '
+            + EducationMetric.EDUCATION_METRIC_ELAPSED_TIME + ' LONG NOT NULL, '
+            + EducationMetric.EDUCATION_METRIC_DATE + ' DATETIME NOT NULL '
+            + ');');    
 }
 
 module.exports.record_call_bell = function(message) {
@@ -75,9 +82,29 @@ module.exports.record_call_bell = function(message) {
                 + message.state.LOCATION_ID + "', '"
                 + message.payload + "', "
                 + "NOW()"
-            + ");"
+            + ");";
     
     query_resposne_handler(sqlQuery, function(err, result) {});
+}
+
+module.exports.record_education_metric = function(metric) {
+    sqlQuery = "INSERT INTO EDUCATION_METRICS (" 
+                + State.HOSPITAL_ID + ", "
+                + State.GROUP_ID + ", "
+                + State.LOCATION_ID + ", "
+                + EducationMetric.EDUCATION_METRIC_TITLE + ", "
+                + EducationMetric.EDUCATION_METRIC_ELAPSED_TIME + ", "
+                + EducationMetric.EDUCATION_METRIC_DATE + ") "
+            + "VALUES ('"
+                + metric.STATE.HOSPITAL_ID + "', '"
+                + metric.STATE.GROUP_ID + "', '"
+                + metric.STATE.LOCATION_ID + "', '"
+                + metric.EDUCATION_METRIC_TITLE + "', "
+                + metric.EDUCATION_METRIC_ELAPSED_TIME + ", '"
+                + metric.EDUCATION_METRIC_DATE
+            + "');";
+    
+    query_resposne_handler (sqlQuery, function() {});
 }
 
 module.exports.get_reg_id = function (hospital_id, group_id, location_id, cb) {

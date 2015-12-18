@@ -28,7 +28,9 @@ var stubbedDao = {
     get_reg_id: sandbox.stub().yields(
         null, 
         [ { REGISTRATION_ID: 'TEST_ER_STATION' } ]
-    )
+    ),
+    
+    record_call_bell: sandbox.stub().returns()
 }
 
 var stubbedGcm = {

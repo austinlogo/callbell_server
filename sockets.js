@@ -2,7 +2,9 @@ var socketio = require('socket.io');
 var registration = require('./business/registration');
 var RegistrationRequest = require('./models/RegistrationRequest');
 var State = require('./models/State');
+var Metric = require('./models/EducationMetric');
 var messages = require('./business/messages');
+var metrics = require('./business/metrics');
 var moment = require('moment');
 
 var io;
@@ -121,7 +123,11 @@ function init_listeners() {
         });
         
         socket.on(UPLOAD_EDUCATION_METRICS, function(request) {
-             
+            console.log(UPLOAD_EDUCATION_METRICS);
+            
+            var body = JSON.parse(request);
+            console.log(body);
+            metrics.record_education_metrics(body);
         });
         
 //
