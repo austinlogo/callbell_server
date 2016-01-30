@@ -37,7 +37,7 @@ module.exports.init = function() {
             State.PHYSICIAN_ID + ' VARCHAR(50) NOT NULL, ' +
             State.NURSE_ID + ' VARCHAR(50), ' +
             State.RESIDENT_ID + ' VARCHAR(50), ' + 
-            State.CHIEF_COMPLAINT_ID + ' VARCHAR(100), ' +
+            State.CHIEF_COMPLAINT_ID + ' INT, ' +
             State.PENDING_TESTS_ID + ' VARCHAR(1000), ' +
             State.PENDING_MEDICATIONS_ID + ' VARCHAR(1000), ' +
             State.DONE_TESTS_ID + ' VARCHAR(1000), ' +
