@@ -26,10 +26,13 @@ exports.success = function(str) {
  * e.g: tablet_id_log("Send Message to:", state.tablet_name) 
  */
 exports.id = function(prefix, id) {
-	if (id === undefined) {
+	if (id === undefined || id === null) {
 		id = "undefined";
 	}
-	console.log(prefix + id.yellow);
+
+	if (notUndefined(prefix)) {
+		console.log(prefix + id.yellow);
+	}
 }
 
 function notUndefined(str) {
