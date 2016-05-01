@@ -46,7 +46,7 @@ function init_listeners() {
             var json = JSON.parse(request);
             var state = new State(json);
             
-            console.log("REGISTER".green.bold);
+            logger.entry("REGISTER");
             console.log(state);
 
             var client_id = state.TABLET_NAME;
@@ -87,7 +87,7 @@ function init_listeners() {
 
         socket.on("RECEIVE", function (request) {
             var jsonRequest = JSON.parse(request);
-            console.log("RECEIVE".green.bold);
+            logger.entry("RECEIVE");
             messages.route_message(jsonRequest, function(resp) {
                 // res.send(resp);
             }); 

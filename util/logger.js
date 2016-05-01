@@ -33,5 +33,5 @@ exports.id = function(prefix, id) {
 }
 
 function notUndefined(str) {
-	return str !== undefined;
+	return str !== undefined && str !== null;
 }
