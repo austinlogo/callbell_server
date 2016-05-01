@@ -1,6 +1,7 @@
 var mysqlDao = require('../dao/mysqldao');
 var async = require('async');
 var messages = require('../business/messages');
+var logger = require("../util/logger");
 
 //saves registration and returns the response in the callback
 exports.save_registration = function (state, master_callback) {
@@ -14,7 +15,7 @@ exports.save_registration = function (state, master_callback) {
 					function(err, result) {
                 
 				if (err != undefined) {
-					console.log("error saving registration: " + err);
+					logger.error("error saving registration: " + err);
 				}
                 
 				 cb (err, result);

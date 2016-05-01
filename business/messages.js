@@ -3,6 +3,7 @@ var Message = require('../models/Message');
 var mysqlDao = require('../dao/mysqldao');
 var gcm = require('../dao/gcmdao');
 var State = require('../models/State');
+var logger = require("../util/logger");
 
 exports.route_message = function(json, master_callback) {
 	var message = new Message(json);
@@ -12,7 +13,7 @@ exports.route_message = function(json, master_callback) {
     }
 
 	send_gcm_message(message, function(gcm_result) {
-        console.log("GCM: " + gcm_result);
+        console.log(gcm_result);
 		return master_callback (null, gcm_result);
 	});
 }
@@ -34,7 +35,7 @@ exports.update_state = function (body, master_callback) {
 		
 		function(cb) {
 			mysqlDao.get_device_row(state, function(err, result) {
-				console.log("DEVICE: " + result[0]['DEVICE_ID']);
+				logger.id("DEVICE: ", result[0]['DEVICE_ID']);
 				cb(err, result[0])
 			});
 		},
@@ -51,14 +52,13 @@ exports.update_state = function (body, master_callback) {
 		},
 		function(device_row, cb) {
 			message.payload = device_row;
-			console.log("Send message to " + message.to_id);
+			logger.id("Send message to " + message.to_id);
 			send_gcm_message(message, function(gcm_result) {
 				cb(null, gcm_result);
 			});
 		}
 	], function(err, result) {
-
-		console.log("err: " + err);
+		logger.error(err);
 		console.log("---RESULT---");
 		console.log(result);
 		var resp = {
@@ -73,7 +73,7 @@ exports.update_state = function (body, master_callback) {
 exports.retrieve_state = function(json) {
 	var state = new State(json[State.id_key]);
 
-	console.log("MESSAGES RETRIEVE STATE");
+	logger.entry("MESSAGES RETRIEVE STATE");
 	console.log(state);
 	var to = state.LOCATION_ID
 
@@ -139,7 +139,7 @@ function send_gcm_message (message, master_cb) {
 				return
 			}
 
-			console.log("Sending Message from " + message.state.LOCATION_ID);
+			logger.id("Sending Message from ", message.state.LOCATION_ID);
 			gcm.send_message(
                 loc_id, 
                 message.state, 
@@ -147,15 +147,13 @@ function send_gcm_message (message, master_cb) {
                 message.category, 
                 message.state.LOCATION_ID, 
                 function (err, resp) {
-                    console.log("hello darling");
                     console.log(resp);
                     cb (err, resp);
                 });
 		}
 	], function(err, result) {
 		if (err != undefined) {
-			console.log("Error in routing message: ");
-			console.log(err);
+			logger.error(err);
 			master_cb(err);
 			
 		}

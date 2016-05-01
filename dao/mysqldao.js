@@ -3,6 +3,7 @@ var State = require('../models/State');
 var Message = require('../models/Message');
 var EducationMetric = require('../models/EducationMetric');
 var env = require('../config/env');
+var logger = require ("../util/logger")
 
 var DEVICE_ID = 'DEVICE_ID';
 var REGISTRATION_ID = 'REGISTRATION_ID';
@@ -171,8 +172,8 @@ module.exports.get_tablet_station_name = function (reg_id, cb) {
 
 	internal_query(get_device_row, function (err, result) {
 		if (err != undefined) {
-			console.error("send_connection_status_to_station error");
-			console.error(err);
+			logger.error("send_connection_status_to_station error");
+			logger.error(err);
             return cb(error, null);
 		} else if (result == undefined || result[0] == undefined) {
             console.log("no results returned");
@@ -189,13 +190,10 @@ module.exports.get_tablet_station_name = function (reg_id, cb) {
 module.exports.insert_states = function( device_id, st, cb) {
 
 	var replace_string = "[" + String.fromCharCode(8217) + String.fromCharCode(8216) + String.fromCharCode(39) + "]";
-	console.log();
  
 	console.log("start_replace");
 	var all_tests = JSON.stringify(st.ALL_TESTS_ID).replace(new RegExp(replace_string, "g"), "\\'");
 	var all_meds = JSON.stringify(st.ALL_MEDICATIONS_ID).replace("'", "\\'");
-	console.log("INSERT");
-	console.log(all_tests);
 	
 	var add_state_query = "INSERT INTO states (" 
 				+ DEVICE_ID + ", " 
@@ -266,7 +264,7 @@ function query_resposne_handler(query_string, cb) {
 	console.log("Query String: " + query_string);
 	connection.query(query_string, function (err, result) {
 		if (err != undefined) {
-			console.log("Database query error: " + err);
+			logger.error("Database query error: " + err);
 		} 
 
 		console.log("Query result: ");
@@ -279,10 +277,9 @@ function internal_query(query_string, cb) {
 	console.log("Query String: " + query_string);
 	connection.query(query_string, function (err, result) {
 		if (err != undefined) {
-			console.log("Database query error: " + err);
+			logger.error("Database query error: " + err);
 		} 
 
-        console.log("check")
 		cb (err, result);
 	});
 }

@@ -1,3 +1,5 @@
+require("./util/console-timestamp")
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -8,7 +10,6 @@ var requests = require('./routes/requests');
 var app = express();
 var mysqlDao = require('./dao/mysqldao');
 var http = require('http');
-
 
 // process.stdout.write('\033c');
 //Initialize the Database
@@ -144,7 +145,6 @@ function normalizePort(val) {
 // }
 
 module.exports = server;
-
 
 
 function onError(error) {
